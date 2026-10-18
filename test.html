@@ -1,0 +1,315 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Итоговый тест — Основы компьютерного зрения</title>
+<meta name="description" content="Комплекс тестовых заданий по курсу с автоматической проверкой.">
+<meta name="author" content="Гордова Анна">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Unbounded:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 3 3'%3E%3Crect width='1' height='1' fill='%23c8323f'/%3E%3Crect x='1' y='1' width='1' height='1' fill='%23157f69'/%3E%3Crect x='2' y='2' width='1' height='1' fill='%232453a6'/%3E%3C/svg%3E">
+<script src="assets/site.js"></script>
+</head>
+<body>
+<a class="skip" href="#main">Перейти к содержимому</a>
+<header class="site-header">
+  <div class="site-header__inner">
+    <a class="brand" href="index.html"><span class="brand__mark" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span>Основы компьютерного зрения</a>
+    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">Меню</button>
+    <nav class="site-nav" id="site-nav" aria-label="Основная навигация">
+      <ul>
+        <li><a href="index.html">Главная</a></li>
+        <li><a href="program.html">Программа</a></li>
+        <li><a href="section-1.html">Лекции</a></li>
+        <li><a href="test.html" aria-current="page">Тест</a></li>
+        <li><a href="practice.html">Практика</a></li>
+        <li><a href="sources.html">Литература</a></li>
+        <li><a href="guide.html">Руководство</a></li>
+        <li><a href="author.html">Об авторе</a></li>
+      </ul>
+    </nav>
+    <button class="theme-toggle" type="button"><span class="tt-icon" aria-hidden="true">◐</span><span class="tt-text">Тёмная тема</span></button>
+  </div>
+</header>
+<main id="main" class="page">
+<div class="page-head">
+  <h1>Итоговый тест</h1>
+  <p class="lead">22 задания по всем шести разделам курса. Отметьте ответы и нажмите «Проверить ответы» внизу страницы: результат и разбор ошибок появятся сразу.</p>
+</div>
+
+<div class="test-intro prose">
+<h2 id="rules" style="margin-top:0">Правила и шкала оценивания</h2>
+<p>В заданиях встречаются блоки ответов разного состава: с одним верным вариантом из трёх–шести, с несколькими верными вариантами и такие, где верны все варианты. Тип задания указан под его текстом:</p>
+<ul>
+  <li><strong>«Выберите один ответ»</strong> — верный вариант ровно один;</li>
+  <li><strong>«Выберите все верные ответы»</strong> — верных вариантов может быть один, несколько или все.</li>
+</ul>
+<p><strong>Критерий оценивания задания:</strong> за каждое задание начисляется 1 балл, если выбранный набор ответов полностью совпадает с правильным. Частично верный ответ, лишний или пропущенный вариант оцениваются в 0 баллов. Максимум — 22 балла.</p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Баллы</th><th>Доля верных ответов</th><th>Оценка</th></tr></thead>
+  <tbody>
+    <tr><td>19–22</td><td>85 % и более</td><td>отлично</td></tr>
+    <tr><td>16–18</td><td>70–84 %</td><td>хорошо</td></tr>
+    <tr><td>13–15</td><td>55–69 %</td><td>удовлетворительно</td></tr>
+    <tr><td>0–12</td><td>менее 55 %</td><td>неудовлетворительно</td></tr>
+  </tbody>
+</table>
+</div>
+<p>Процент верных ответов входит в итоговую оценку по курсу с весом 40 % (см. <a href="program.html#control">формы контроля</a>).</p>
+</div>
+
+<h2 id="questions">Задания</h2>
+<form id="test-form" novalidate>
+
+<fieldset class="tq" data-answer="b">
+  <legend><span class="qn">1.</span>Сколько уровней яркости можно закодировать при глубине 8 бит на канал?</legend>
+  <p class="hint">Выберите один ответ <span class="sec">(раздел 1)</span></p>
+  <label><input type="radio" name="q1" value="a"> <span>255</span></label>
+  <label><input type="radio" name="q1" value="b"> <span>256</span></label>
+  <label><input type="radio" name="q1" value="c"> <span>512</span></label>
+  <p class="explain" hidden>2<sup>8</sup> = 256 уровней: от 0 до 255 включительно.</p>
+</fieldset>
+
+<fieldset class="tq" data-answer="a,b">
+  <legend><span class="qn">2.</span>Какие утверждения о представлении изображений в OpenCV верны?</legend>
+  <p class="hint">Выберите все верные ответы <span class="sec">(раздел 1)</span></p>
+  <label><input type="checkbox" name="q2" value="a"> <span>Начало координат находится в левом верхнем углу</span></label>
+  <label><input type="checkbox" name="q2" value="b"> <span>К пикселю обращаются как <code>img[строка, столбец]</code></span></label>
+  <label><input type="checkbox" name="q2" value="c"> <span>Ось y направлена снизу вверх</span></label>
+  <label><input type="checkbox" name="q2" value="d"> <span>Каналы цветного изображения хранятся в порядке RGB</span></label>
+  <p class="explain" hidden>Ось строк направлена вниз, а каналы OpenCV хранит в порядке BGR.</p>
+</fieldset>
+
+<fieldset class="tq" data-answer="a,c,d">
+  <legend><span class="qn">3.</span>Какие форматы сохраняют изображение без потери качества?</legend>
+  <p class="hint">Выберите все верные ответы <span class="sec">(раздел 1)</span></p>
+  <label><input type="checkbox" name="q3" value="a"> <span>PNG</span></label>
+  <label><input type="checkbox" name="q3" value="b"> <span>JPEG</span></label>
+  <label><input type="checkbox" name="q3" value="c"> <span>BMP</span></label>
+  <label><input type="checkbox" name="q3" value="d"> <span>TIFF без сжатия или со сжатием LZW</span></label>
+  <label><input type="checkbox" name="q3" value="e"> <span>WebP в режиме сжатия с потерями</span></label>
+  <p class="explain" hidden>JPEG и WebP с потерями отбрасывают часть информации; PNG, BMP и TIFF (без сжатия или с LZW) — нет.</p>
+</fieldset>
+
+<fieldset class="tq" data-answer="c">
+  <legend><span class="qn">4.</span>Какой канал имеет наибольший вес при переводе RGB-изображения в оттенки серого по стандарту BT.601?</legend>
+  <p class="hint">Выберите один ответ <span class="sec">(раздел 1)</span></p>
+  <label><input type="radio" name="q4" value="a"> <span>Красный</span></label>
+  <label><input type="radio" name="q4" value="b"> <span>Синий</span></label>
+  <label><input type="radio" name="q4" value="c"> <span>Зелёный</span></label>
+  <label><input type="radio" name="q4" value="d"> <span>Веса всех каналов равны</span></label>
+  <p class="explain" hidden>Y = 0,299R + 0,587G + 0,114B: глаз наиболее чувствителен к зелёному.</p>
+</fieldset>
+
+<fieldset class="tq" data-answer="c">
+  <legend><span class="qn">5.</span>Какой фильтр лучше всего подавляет импульсный шум «соль и перец», сохраняя границы?</legend>
+  <p class="hint">Выберите один ответ <span class="sec">(раздел 2)</span></p>
+  <label><input type="radio" name="q5" value="a"> <span>Усредняющий</span></label>
+  <label><input type="radio" name="q5" value="b"> <span>Гауссов</span></label>
+  <label><input type="radio" name="q5" value="c"> <span>Медианный</span></label>
+  <label><input type="radio" name="q5" value="d"> <span>Лапласа</span></label>
+  <label><input type="radio" name="q5" value="e"> <span>Собеля</span></label>
+  <p class="explain" hidden>Медиана не учитывает одиночные экстремальные значения, а линейные фильтры «размазывают» их по окрестности.</p>
+</fieldset>
+
+<fieldset class="tq" data-answer="a,b,c,d">
+  <legend><span class="qn">6.</span>Какие шаги входят в алгоритм детектора границ Кэнни?</legend>
+  <p class="hint">Выберите все верные ответы <span class="sec">(раздел 2)</span></p>
+  <label><input type="checkbox" name="q6" value="a"> <span>Сглаживание гауссовым фильтром</span></label>
+  <label><input type="checkbox" name="q6" value="b"> <span>Вычисление модуля и направления градиента</span></label>
+  <label><input type="checkbox" name="q6" value="c"> <span>Подавление немаксимумов</span></label>
+  <label><input type="checkbox" name="q6" value="d"> <span>Двойная пороговая обработка с гистерезисом</span></label>
+  <p class="explain" hidden>Верны все четыре варианта — это и есть четыре шага алгоритма.</p>
+</fieldset>
+
+<fieldset class="tq" data-answer="a">
+  <legend><span class="qn">7.</span>Какой критерий оптимизирует метод Оцу при выборе порога бинаризации?</legend>
+  <p class="hint">Выберите все верные ответы <span class="sec">(раздел 2)</span></p>
+  <label><input type="checkbox" name="q7" value="a"> <span>Максимум межклассовой дисперсии</span></label>
+  <label><input type="checkbox" name="q7" value="b"> <span>Максимум внутриклассовой дисперсии</span></label>
+  <label><input type="checkbox" name="q7" value="c"> <span>Равенство порога средней яркости изображения</span></label>
+  <p class="explain" hidden>Оцу максимизирует межклассовую дисперсию, что равносильно минимизации внутриклассовой.</p>
+</fieldset>
+
+<fieldset class="tq" data-answer="c">
+  <legend><span class="qn">8.</span>Какая морфологическая операция удаляет мелкие белые точки шума, почти не меняя размер крупных объектов?</legend>
+  <p class="hint">Выберите один ответ <span class="sec">(раздел 2)</span></p>
+  <label><input type="radio" name="q8" value="a"> <span>Эрозия</span></label>
+  <label><input type="radio" name="q8" value="b"> <span>Дилатация</span></label>
+  <label><input type="radio" name="q8" value="c"> <span>Размыкание</span></label>
+  <label><input type="radio" name="q8" value="d"> <span>Замыкание</span></label>
+  <p class="explain" hidden>Размыкание — эрозия, затем дилатация: эрозия убирает мелкие точки, дилатация возвращает крупным объектам прежний размер.</p>
+</fieldset>
+
+<fieldset class="tq" data-answer="c">
+  <legend><span class="qn">9.</span>Изображение 28 × 28 сворачивается с ядром 5 × 5 без отступа с шагом 1. Каков размер выхода?</legend>
+  <p class="hint">Выберите один ответ <span class="sec">(раздел 3)</span></p>
+  <label><input type="radio" name="q9" value="a"> <span>22 × 22</span></label>
+  <label><input type="radio" name="q9" value="b"> <span>23 × 23</span></label>
+  <label><input type="radio" name="q9" value="c"> <span>24 × 24</span></label>
+  <label><input type="radio" name="q9" value="d"> <span>25 × 25</span></label>
+  <label><input type="radio" name="q9" value="e"> <span>26 × 26</span></label>
+  <label><input type="radio" name="q9" value="f"> <span>28 × 28</span></label>
+  <p class="explain" hidden>O = (28 + 0 − 5) / 1 + 1 = 24.</p>
+</fieldset>
+
+<fieldset class="tq" data-answer="a,d">
+  <legend><span class="qn">10.</span>У каких ядер сумма весов равна нулю?</legend>
+  <p class="hint">Выберите все верные ответы <span class="sec">(раздел 3)</span></p>
+  <label><input type="checkbox" name="q10" value="a"> <span>Собель по X</span></label>
+  <label><input type="checkbox" name="q10" value="b"> <span>Гауссово ядро</span></label>
+  <label><input type="checkbox" name="q10" value="c"> <span>Усредняющее ядро</span></label>
+  <label><input type="checkbox" name="q10" value="d"> <span>Лапласиан</span></label>
+  <label><input type="checkbox" name="q10" value="e"> <span>Ядро повышения резкости</span></label>
+  <p class="explain" hidden>Ядра-детекторы границ дают ноль на однородных участках. У сглаживающих ядер и ядра резкости сумма равна 1.</p>
+</fieldset>
+
+<fieldset class="tq" data-answer="a,b,c">
+  <legend><span class="qn">11.</span>Какими свойствами обладает двумерная дискретная свёртка?</legend>
+  <p class="hint">Выберите все верные ответы <span class="sec">(раздел 3)</span></p>
+  <label><input type="checkbox" name="q11" value="a"> <span>Линейность</span></label>
+  <label><input type="checkbox" name="q11" value="b"> <span>Эквивариантность к сдвигу</span></label>
+  <label><input type="checkbox" name="q11" value="c"> <span>Ассоциативность</span></label>
+  <p class="explain" hidden>Верны все три варианта.</p>
+</fieldset>
+
+<fieldset class="tq" data-answer="b">
+  <legend><span class="qn">12.</span>Сколько обучаемых параметров у слоя <code>nn.Conv2d(3, 64, kernel_size=3)</code> со смещением?</legend>
+  <p class="hint">Выберите один ответ <span class="sec">(раздел 3)</span></p>
+  <label><input type="radio" name="q12" value="a"> <span>1728</span></label>
+  <label><input type="radio" name="q12" value="b"> <span>1792</span></label>
+  <label><input type="radio" name="q12" value="c"> <span>576</span></label>
+  <label><input type="radio" name="q12" value="d"> <span>192</span></label>
+  <p class="explain" hidden>64 · (3 · 3 · 3 + 1) = 64 · 28 = 1792. Ответ 1728 не учитывает смещения.</p>
+</fieldset>
+
+<fieldset class="tq" data-answer="a,b,c">
+  <legend><span class="qn">13.</span>Какие утверждения о свёрточном слое <code>nn.Conv2d</code> в PyTorch верны?</legend>
+  <p class="hint">Выберите все верные ответы <span class="sec">(раздел 3)</span></p>
+  <label><input type="checkbox" name="q13" value="a"> <span>Фактически вычисляется взаимная корреляция</span></label>
+  <label><input type="checkbox" name="q13" value="b"> <span>Каждое ядро охватывает все входные каналы</span></label>
+  <label><input type="checkbox" name="q13" value="c"> <span>Число выходных каналов равно числу ядер</span></label>
+  <label><input type="checkbox" name="q13" value="d"> <span>Перед применением ядро поворачивается на 180°</span></label>
+  <label><input type="checkbox" name="q13" value="e"> <span>Число параметров зависит от размера входного изображения</span></label>
+  <label><input type="checkbox" name="q13" value="f"> <span>Свёртка 1 × 1 не может изменить число каналов</span></label>
+  <p class="explain" hidden>Ядро не поворачивается; параметры зависят только от числа каналов и размера ядра; свёртка 1 × 1 как раз и используется для изменения числа каналов.</p>
+</fieldset>
+
+<fieldset class="tq" data-answer="a,b,c,d">
+  <legend><span class="qn">14.</span>Какие приёмы помогают бороться с переобучением свёрточной сети?</legend>
+  <p class="hint">Выберите все верные ответы <span class="sec">(раздел 4)</span></p>
+  <label><input type="checkbox" name="q14" value="a"> <span>Аугментация данных</span></label>
+  <label><input type="checkbox" name="q14" value="b"> <span>Dropout</span></label>
+  <label><input type="checkbox" name="q14" value="c"> <span>Затухание весов (weight decay)</span></label>
+  <label><input type="checkbox" name="q14" value="d"> <span>Ранняя остановка по валидационной выборке</span></label>
+  <label><input type="checkbox" name="q14" value="e"> <span>Увеличение числа эпох обучения</span></label>
+  <p class="explain" hidden>Дополнительные эпохи, наоборот, усиливают переобучение.</p>
+</fieldset>
+
+<fieldset class="tq" data-answer="d">
+  <legend><span class="qn">15.</span>Какая идея позволила обучать сети глубиной более ста слоёв?</legend>
+  <p class="hint">Выберите один ответ <span class="sec">(раздел 4)</span></p>
+  <label><input type="radio" name="q15" value="a"> <span>Использование только ядер 3 × 3</span></label>
+  <label><input type="radio" name="q15" value="b"> <span>Inception-блоки с параллельными ядрами</span></label>
+  <label><input type="radio" name="q15" value="c"> <span>Dropout в полносвязных слоях</span></label>
+  <label><input type="radio" name="q15" value="d"> <span>Остаточные связи <code>y = F(x) + x</code></span></label>
+  <label><input type="radio" name="q15" value="e"> <span>Region Proposal Network</span></label>
+  <p class="explain" hidden>Остаточные связи ResNet обеспечивают прохождение градиента к ранним слоям.</p>
+</fieldset>
+
+<fieldset class="tq" data-answer="a,c">
+  <legend><span class="qn">16.</span>Что верно для переноса обучения с ImageNet на свою задачу?</legend>
+  <p class="hint">Выберите все верные ответы <span class="sec">(раздел 4)</span></p>
+  <label><input type="checkbox" name="q16" value="a"> <span>Последний полносвязный слой заменяют слоем с нужным числом классов</span></label>
+  <label><input type="checkbox" name="q16" value="b"> <span>Перенос возможен, только если классы новой задачи есть в ImageNet</span></label>
+  <label><input type="checkbox" name="q16" value="c"> <span>При очень малом объёме данных веса предобученных слоёв можно заморозить</span></label>
+  <p class="explain" hidden>Признаки ImageNet универсальны и полезны для задач с совсем другими классами, например медицинских.</p>
+</fieldset>
+
+<fieldset class="tq" data-answer="b">
+  <legend><span class="qn">17.</span>Чему равен IoU рамок A = (0, 0, 4, 4) и B = (2, 0, 6, 4) в формате (x<sub>min</sub>, y<sub>min</sub>, x<sub>max</sub>, y<sub>max</sub>)?</legend>
+  <p class="hint">Выберите один ответ <span class="sec">(раздел 5)</span></p>
+  <label><input type="radio" name="q17" value="a"> <span>1/2</span></label>
+  <label><input type="radio" name="q17" value="b"> <span>1/3</span></label>
+  <label><input type="radio" name="q17" value="c"> <span>1/4</span></label>
+  <label><input type="radio" name="q17" value="d"> <span>2/3</span></label>
+  <label><input type="radio" name="q17" value="e"> <span>1/6</span></label>
+  <p class="explain" hidden>Пересечение 2 · 4 = 8, объединение 16 + 16 − 8 = 24, IoU = 8/24 = 1/3.</p>
+</fieldset>
+
+<fieldset class="tq" data-answer="a,b,d">
+  <legend><span class="qn">18.</span>Какие из детекторов относятся к одностадийным?</legend>
+  <p class="hint">Выберите все верные ответы <span class="sec">(раздел 5)</span></p>
+  <label><input type="checkbox" name="q18" value="a"> <span>YOLO</span></label>
+  <label><input type="checkbox" name="q18" value="b"> <span>SSD</span></label>
+  <label><input type="checkbox" name="q18" value="c"> <span>Faster R-CNN</span></label>
+  <label><input type="checkbox" name="q18" value="d"> <span>RetinaNet</span></label>
+  <label><input type="checkbox" name="q18" value="e"> <span>R-CNN</span></label>
+  <p class="explain" hidden>R-CNN и Faster R-CNN сначала предлагают области, затем их классифицируют, то есть являются двухстадийными.</p>
+</fieldset>
+
+<fieldset class="tq" data-answer="c">
+  <legend><span class="qn">19.</span>Для чего в детекторах применяют алгоритм подавления немаксимумов (NMS)?</legend>
+  <p class="hint">Выберите все верные ответы <span class="sec">(раздел 5)</span></p>
+  <label><input type="checkbox" name="q19" value="a"> <span>Чтобы увеличить число областей-кандидатов</span></label>
+  <label><input type="checkbox" name="q19" value="b"> <span>Чтобы вычислить метрику mAP</span></label>
+  <label><input type="checkbox" name="q19" value="c"> <span>Чтобы удалить дублирующие рамки одного объекта</span></label>
+  <label><input type="checkbox" name="q19" value="d"> <span>Чтобы подобрать размеры якорей</span></label>
+  <p class="explain" hidden>NMS оставляет из сильно перекрывающихся рамок одну — с наибольшей уверенностью.</p>
+</fieldset>
+
+<fieldset class="tq" data-answer="a,c,d,f">
+  <legend><span class="qn">20.</span>Какие архитектуры предназначены для сегментации изображений?</legend>
+  <p class="hint">Выберите все верные ответы <span class="sec">(раздел 6)</span></p>
+  <label><input type="checkbox" name="q20" value="a"> <span>U-Net</span></label>
+  <label><input type="checkbox" name="q20" value="b"> <span>AlexNet</span></label>
+  <label><input type="checkbox" name="q20" value="c"> <span>DeepLab</span></label>
+  <label><input type="checkbox" name="q20" value="d"> <span>Mask R-CNN</span></label>
+  <label><input type="checkbox" name="q20" value="e"> <span>YOLO первой версии</span></label>
+  <label><input type="checkbox" name="q20" value="f"> <span>FCN</span></label>
+  <p class="explain" hidden>AlexNet — классификатор, первая версия YOLO — детектор.</p>
+</fieldset>
+
+<fieldset class="tq" data-answer="d">
+  <legend><span class="qn">21.</span>Предсказанная маска содержит 4 пикселя, истинная — 6, общих пикселей 3. Чему равен коэффициент Dice?</legend>
+  <p class="hint">Выберите один ответ <span class="sec">(раздел 6)</span></p>
+  <label><input type="radio" name="q21" value="a"> <span>0,30</span></label>
+  <label><input type="radio" name="q21" value="b"> <span>0,43</span></label>
+  <label><input type="radio" name="q21" value="c"> <span>0,50</span></label>
+  <label><input type="radio" name="q21" value="d"> <span>0,60</span></label>
+  <p class="explain" hidden>Dice = 2 · 3 / (4 + 6) = 0,6. Значение 0,43 — это IoU = 3/7.</p>
+</fieldset>
+
+<fieldset class="tq" data-answer="b">
+  <legend><span class="qn">22.</span>Какой вид сегментации различает отдельные объекты одного класса, но не размечает фоновые области вроде неба и дороги?</legend>
+  <p class="hint">Выберите один ответ <span class="sec">(раздел 6)</span></p>
+  <label><input type="radio" name="q22" value="a"> <span>Семантическая</span></label>
+  <label><input type="radio" name="q22" value="b"> <span>Экземплярная</span></label>
+  <label><input type="radio" name="q22" value="c"> <span>Паноптическая</span></label>
+  <p class="explain" hidden>Семантическая не различает экземпляры, паноптическая размечает и экземпляры, и фон.</p>
+</fieldset>
+
+<div class="test-actions">
+  <button class="btn btn--primary" type="submit">Проверить ответы</button>
+  <button class="btn btn--ghost" type="reset">Начать заново</button>
+  <span class="progress" id="test-progress" aria-live="polite"></span>
+</div>
+</form>
+
+<div class="result" id="test-result" hidden tabindex="-1" aria-live="polite"></div>
+<noscript><p class="note">Автоматическая проверка работает при включённом JavaScript.</p></noscript>
+
+</main>
+<footer class="site-footer">
+  <div class="site-footer__inner">
+    <span>ЭУМК «Основы компьютерного зрения». Автор: <a href="author.html">Гордова Анна</a>, 2026</span>
+    <span><a href="sources.html">Литература</a>&emsp;<a href="guide.html">Как пользоваться курсом</a></span>
+  </div>
+</footer>
+<script src="assets/test.js"></script>
+</body>
+</html>

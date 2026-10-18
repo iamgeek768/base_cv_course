@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Основы компьютерного зрения</title>
+<meta name="description" content="Электронный учебно-методический комплекс по курсу «Основы компьютерного зрения».">
+<meta name="author" content="Гордова Анна">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Unbounded:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 3 3'%3E%3Crect width='1' height='1' fill='%23c8323f'/%3E%3Crect x='1' y='1' width='1' height='1' fill='%23157f69'/%3E%3Crect x='2' y='2' width='1' height='1' fill='%232453a6'/%3E%3C/svg%3E">
+<script src="assets/site.js"></script>
+</head>
+<body>
+<a class="skip" href="#main">Перейти к содержимому</a>
+<header class="site-header">
+  <div class="site-header__inner">
+    <a class="brand" href="index.html"><span class="brand__mark" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span>Основы компьютерного зрения</a>
+    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">Меню</button>
+    <nav class="site-nav" id="site-nav" aria-label="Основная навигация">
+      <ul>
+        <li><a href="index.html" aria-current="page">Главная</a></li>
+        <li><a href="program.html">Программа</a></li>
+        <li><a href="section-1.html">Лекции</a></li>
+        <li><a href="test.html">Тест</a></li>
+        <li><a href="practice.html">Практика</a></li>
+        <li><a href="sources.html">Литература</a></li>
+        <li><a href="guide.html">Руководство</a></li>
+        <li><a href="author.html">Об авторе</a></li>
+      </ul>
+    </nav>
+    <button class="theme-toggle" type="button"><span class="tt-icon" aria-hidden="true">◐</span><span class="tt-text">Тёмная тема</span></button>
+  </div>
+</header>
+<main id="main">
+<section class="hero" aria-labelledby="hero-title">
+  <div>
+    <h1 id="hero-title"><span class="line">Основы</span><span class="line">компьютерного</span><span class="line">зрения</span></h1>
+    <p class="lead">Как компьютер видит изображение: от таблицы чисел и простых фильтров до свёрточных нейросетей, которые классифицируют, находят и выделяют объекты.</p>
+    <div class="actions">
+      <a class="btn btn--primary" href="section-1.html">Начать с первого раздела</a>
+      <a class="btn btn--ghost" href="program.html">Открыть программу курса</a>
+    </div>
+    <div class="meta-row">
+      <span><b>72</b> академических часа</span>
+      <span><b>6</b> разделов</span>
+      <span><b>22</b> тестовых задания</span>
+      <span><b>5</b> практических работ</span>
+    </div>
+  </div>
+  <figure>
+    <div class="conv" data-conv data-autoplay data-kernel="sobelx">
+      <noscript>Интерактивная демонстрация свёртки работает при включённом JavaScript.</noscript>
+    </div>
+    <figcaption>Свёртка в действии: окно 3×3 проходит по изображению, и каждый пиксель результата — это сумма произведений яркостей на веса ядра. Выберите другое ядро или нажмите на ячейку результата.</figcaption>
+  </figure>
+</section>
+
+<section class="course-map" aria-labelledby="units-title">
+  <h2 id="units-title">Разделы курса</h2>
+  <ol class="units">
+    <li><a href="section-1.html"><span class="u-num">1</span><span><span class="u-title">Что такое изображение</span><span class="u-desc">Дискретизация и квантование, пиксели, цветовые модели, форматы, модель камеры, гистограмма.</span></span><span class="u-hours">6 ч</span></a></li>
+    <li><a href="section-2.html"><span class="u-num">2</span><span><span class="u-title">Классические методы обработки</span><span class="u-desc">Яркостные преобразования, пороговая бинаризация, фильтрация шумов, границы, морфология, геометрия.</span></span><span class="u-hours">12 ч</span></a></li>
+    <li><a href="section-3.html"><span class="u-num">3</span><span><span class="u-title">Свёртки</span><span class="u-desc">Определение, шаг и отступ, типовые ядра, свойства, многоканальная свёртка.</span></span><span class="u-hours">12 ч</span></a></li>
+    <li><a href="section-4.html"><span class="u-num">4</span><span><span class="u-title">Классификация на основе свёрток</span><span class="u-desc">Свёрточные нейронные сети, обучение, архитектуры от LeNet до ResNet, перенос обучения, метрики.</span></span><span class="u-hours">18 ч</span></a></li>
+    <li><a href="section-5.html"><span class="u-num">5</span><span><span class="u-title">Детекция объектов</span><span class="u-desc">Рамки и IoU, подавление немаксимумов, mAP, двухстадийные и одностадийные детекторы.</span></span><span class="u-hours">12 ч</span></a></li>
+    <li><a href="section-6.html"><span class="u-num">6</span><span><span class="u-title">Сегментация изображений</span><span class="u-desc">Классические методы, FCN, U-Net, DeepLab, Mask R-CNN, метрики IoU и Dice.</span></span><span class="u-hours">12 ч</span></a></li>
+  </ol>
+</section>
+
+<section class="band" aria-labelledby="about-title">
+  <div class="band__inner split">
+    <div class="prose">
+      <h2 id="about-title">Аннотация</h2>
+      <p>Курс «Основы компьютерного зрения» знакомит с тем, как цифровое изображение устроено, как его обрабатывать классическими методами и как решать с помощью свёрточных нейронных сетей три центральные задачи компьютерного зрения: классификацию, детекцию и сегментацию.</p>
+      <p>Материал выстроен от простого к сложному: сначала изображение рассматривается как массив чисел, затем вводятся фильтры и операция свёртки, и уже на этой основе строятся нейросетевые модели. Каждый раздел содержит теорию со ссылками на литературу, контрольные вопросы, упражнения и разобранный пример.</p>
+      <p>Курс рассчитан на студентов, знакомых с основами программирования на Python и линейной алгебры. Практика ведётся на Python с библиотеками NumPy, OpenCV и PyTorch.</p>
+    </div>
+    <div>
+      <h2>Материалы курса</h2>
+      <ul class="linklist">
+        <li><a href="program.html">Рабочая учебная программа</a><span>Цель, задачи, результаты обучения, разделы и часы, формы контроля.</span></li>
+        <li><a href="test.html">Итоговый тест</a><span>22 задания с автоматической проверкой и шкалой оценивания.</span></li>
+        <li><a href="practice.html">Практические задания</a><span>5 работ на Python с критериями оценивания.</span></li>
+        <li><a href="sources.html">Список литературы</a><span>Учебники, статьи и интернет-ресурсы.</span></li>
+        <li><a href="guide.html">Руководство пользователя</a><span>Как устроен сайт и в каком порядке его изучать.</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+</main>
+<footer class="site-footer">
+  <div class="site-footer__inner">
+    <span>ЭУМК «Основы компьютерного зрения». Автор: <a href="author.html">Гордова Анна</a>, 2026</span>
+    <span><a href="sources.html">Литература</a>&emsp;<a href="guide.html">Как пользоваться курсом</a></span>
+  </div>
+</footer>
+</body>
+</html>

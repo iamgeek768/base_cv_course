@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Классические методы обработки — Основы компьютерного зрения</title>
+<meta name="description" content="Раздел 2 курса «Основы компьютерного зрения»: классические методы обработки.">
+<meta name="author" content="Гордова Анна">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Unbounded:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 3 3'%3E%3Crect width='1' height='1' fill='%23c8323f'/%3E%3Crect x='1' y='1' width='1' height='1' fill='%23157f69'/%3E%3Crect x='2' y='2' width='1' height='1' fill='%232453a6'/%3E%3C/svg%3E">
+<script src="assets/site.js"></script>
+</head>
+<body>
+<a class="skip" href="#main">Перейти к содержимому</a>
+<header class="site-header">
+  <div class="site-header__inner">
+    <a class="brand" href="index.html"><span class="brand__mark" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span>Основы компьютерного зрения</a>
+    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">Меню</button>
+    <nav class="site-nav" id="site-nav" aria-label="Основная навигация">
+      <ul>
+        <li><a href="index.html">Главная</a></li>
+        <li><a href="program.html">Программа</a></li>
+        <li><a href="section-1.html" aria-current="page">Лекции</a></li>
+        <li><a href="test.html">Тест</a></li>
+        <li><a href="practice.html">Практика</a></li>
+        <li><a href="sources.html">Литература</a></li>
+        <li><a href="guide.html">Руководство</a></li>
+        <li><a href="author.html">Об авторе</a></li>
+      </ul>
+    </nav>
+    <button class="theme-toggle" type="button"><span class="tt-icon" aria-hidden="true">◐</span><span class="tt-text">Тёмная тема</span></button>
+  </div>
+</header>
+<div class="layout">
+<aside class="sidebar" aria-label="Разделы курса">
+<h2>Разделы курса</h2>
+<ol>
+<li><a href="section-1.html"><span class="num">1</span><span>Что такое изображение</span></a></li>
+<li><a href="section-2.html" aria-current="page"><span class="num">2</span><span>Классические методы обработки</span></a></li>
+<li><a href="section-3.html"><span class="num">3</span><span>Свёртки</span></a></li>
+<li><a href="section-4.html"><span class="num">4</span><span>Классификация на основе свёрток</span></a></li>
+<li><a href="section-5.html"><span class="num">5</span><span>Детекция объектов</span></a></li>
+<li><a href="section-6.html"><span class="num">6</span><span>Сегментация изображений</span></a></li>
+</ol>
+<div class="toc-block"><h2>На этой странице</h2>
+<ul class="toc">
+<li><a href="#point">Точечные преобразования яркости</a></li>
+<li><a href="#threshold">Бинаризация и метод Оцу</a></li>
+<li><a href="#equalization">Эквализация гистограммы</a></li>
+<li><a href="#filters">Сглаживание и подавление шума</a></li>
+<li><a href="#edges">Выделение границ</a></li>
+<li><a href="#morphology">Морфологические операции</a></li>
+<li><a href="#geometry">Геометрические преобразования</a></li>
+<li><a href="#features">Особые точки и преобразование Хафа</a></li>
+<li><a href="#questions">Контрольные вопросы</a></li>
+<li><a href="#exercises">Упражнения для самостоятельной работы</a></li>
+</ul></div>
+</aside>
+<main id="main"><article class="prose">
+<div class="page-head">
+  <p class="kicker">Раздел 2 из 6, объём 12 ак. ч</p>
+  <h1>Классические методы обработки изображений</h1>
+  <p class="lead">До появления нейросетей изображения обрабатывали явно заданными формулами. Эти методы и сегодня используются для предобработки, в задачах с малым количеством данных и на слабых устройствах.</p>
+</div>
+
+<h2 id="point">Точечные преобразования яркости</h2>
+<p>Точечное преобразование меняет яркость каждого пикселя независимо от соседей: <code>s = T(r)</code>, где <code>r</code> — исходная яркость, <code>s</code> — новая <span class="ref">[<a href="sources.html#src-1">1</a>, гл. 3]</span>.</p>
+<ul>
+  <li><strong>Негатив:</strong> <code>s = 255 − r</code>. Полезен для рентгеновских и медицинских снимков.</li>
+  <li><strong>Линейное контрастирование:</strong> растягивает диапазон яркостей на весь интервал 0…255.</li>
+  <li><strong>Гамма-коррекция:</strong> при γ &lt; 1 высветляет тёмные области, при γ &gt; 1 затемняет светлые.</li>
+</ul>
+<div class="formula">s = (r − r<sub>min</sub>) / (r<sub>max</sub> − r<sub>min</sub>) · 255        s = 255 · (r / 255)<sup>γ</sup></div>
+
+<h2 id="threshold">Бинаризация и метод Оцу</h2>
+<p>Бинаризация превращает полутоновое изображение в двухцветное: пиксели ярче порога <code>t</code> становятся белыми (объект), остальные — чёрными (фон). Главный вопрос — как выбрать <code>t</code>.</p>
+<p><strong>Метод Оцу</strong> <span class="ref">[<a href="sources.html#src-11">11</a>]</span> перебирает все пороги и выбирает тот, при котором <em>межклассовая дисперсия</em> максимальна, то есть два класса пикселей разделены лучше всего:</p>
+<div class="formula">σ<sub>B</sub><sup>2</sup>(t) = ω<sub>0</sub>(t) · ω<sub>1</sub>(t) · (μ<sub>0</sub>(t) − μ<sub>1</sub>(t))<sup>2</sup> → max
+<span class="where">ω<sub>0</sub>, ω<sub>1</sub> — доли пикселей ниже и выше порога, μ<sub>0</sub>, μ<sub>1</sub> — средние яркости этих классов.</span></div>
+<p>Метод хорошо работает, если гистограмма двухмодальная. При неравномерном освещении применяют <strong>адаптивную бинаризацию</strong>: порог вычисляется отдельно для окрестности каждого пикселя (<code>cv2.adaptiveThreshold</code>) <span class="ref">[<a href="sources.html#src-8">8</a>]</span>.</p>
+
+<h2 id="equalization">Эквализация гистограммы</h2>
+<p>Эквализация перераспределяет яркости так, чтобы гистограмма стала близкой к равномерной. Преобразованием служит накопленная (кумулятивная) функция распределения <span class="ref">[<a href="sources.html#src-1">1</a>, гл. 3]</span>:</p>
+<div class="formula">s<sub>k</sub> = 255 · Σ<sub>j=0…k</sub> p(j)</div>
+<p>Глобальная эквализация может чрезмерно усилить шум в однородных областях. Метод <strong>CLAHE</strong> (Contrast Limited Adaptive Histogram Equalization) выполняет эквализацию в небольших плитках и ограничивает усиление контраста, поэтому даёт более естественный результат.</p>
+
+<h2 id="filters">Сглаживание и подавление шума</h2>
+<p>Пространственный фильтр вычисляет новое значение пикселя по его окрестности. Линейные фильтры реализуются свёрткой с ядром — подробно эта операция разобрана в <a href="section-3.html">разделе 3</a>.</p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Фильтр</th><th>Принцип</th><th>Против какого шума</th><th>Недостаток</th></tr></thead>
+  <tbody>
+    <tr><td>Усредняющий (box)</td><td>Среднее значение в окне</td><td>Слабый гауссов шум</td><td>Сильно размывает границы</td></tr>
+    <tr><td>Гауссов</td><td>Взвешенное среднее, веса по закону Гаусса</td><td>Гауссов шум</td><td>Размывает границы, но мягче</td></tr>
+    <tr><td>Медианный</td><td>Медиана значений в окне (нелинейный)</td><td>Импульсный шум «соль и перец»</td><td>Медленнее линейных, стирает тонкие линии</td></tr>
+    <tr><td>Билатеральный</td><td>Веса зависят и от расстояния, и от разницы яркости</td><td>Шум при необходимости сохранить границы</td><td>Вычислительно дорогой</td></tr>
+  </tbody>
+</table>
+</div>
+<pre><code>blur   = cv2.GaussianBlur(gray, (5, 5), sigmaX=1.0)
+median = cv2.medianBlur(gray, 3)
+bilat  = cv2.bilateralFilter(img, d=9, sigmaColor=75, sigmaSpace=75)</code></pre>
+
+<h2 id="edges">Выделение границ</h2>
+<p>Граница — место резкого изменения яркости. Изменение описывается <strong>градиентом</strong> — вектором частных производных <code>(G<sub>x</sub>, G<sub>y</sub>)</code>. На дискретном изображении производные приближаются разностями, которые удобно записать ядрами <span class="ref">[<a href="sources.html#src-1">1</a>, гл. 10; <a href="sources.html#src-3">3</a>, гл. 8]</span>.</p>
+<div class="fig-box" style="margin-bottom:1.25rem">
+  <div class="matrices">
+    <div><div class="matrix" style="grid-template-columns:repeat(3,auto)"><span>−1</span><span>0</span><span>1</span><span>−2</span><span>0</span><span>2</span><span>−1</span><span>0</span><span>1</span></div><div class="cap">Собель G<sub>x</sub></div></div>
+    <div><div class="matrix" style="grid-template-columns:repeat(3,auto)"><span>−1</span><span>−2</span><span>−1</span><span>0</span><span>0</span><span>0</span><span>1</span><span>2</span><span>1</span></div><div class="cap">Собель G<sub>y</sub></div></div>
+    <div><div class="matrix" style="grid-template-columns:repeat(3,auto)"><span>0</span><span>1</span><span>0</span><span>1</span><span>−4</span><span>1</span><span>0</span><span>1</span><span>0</span></div><div class="cap">Лапласиан</div></div>
+  </div>
+</div>
+<div class="formula">|G| = √(G<sub>x</sub><sup>2</sup> + G<sub>y</sub><sup>2</sup>),   θ = atan2(G<sub>y</sub>, G<sub>x</sub>)</div>
+<p>Оператор Лапласа — вторая производная: он реагирует на границы в любом направлении, но очень чувствителен к шуму, поэтому его применяют после гауссова сглаживания (фильтр LoG).</p>
+<h3>Детектор Кэнни</h3>
+<p>Детектор Джона Кэнни <span class="ref">[<a href="sources.html#src-10">10</a>]</span> — стандарт выделения тонких связных границ. Он состоит из четырёх шагов:</p>
+<ol>
+  <li>сглаживание гауссовым фильтром для подавления шума;</li>
+  <li>вычисление модуля и направления градиента, например операторами Собеля;</li>
+  <li><strong>подавление немаксимумов</strong>: пиксель остаётся, только если модуль градиента в нём максимален вдоль направления градиента — так границы становятся толщиной в один пиксель;</li>
+  <li><strong>двойной порог и гистерезис</strong>: пиксели выше верхнего порога — сильные границы, между порогами — слабые; слабые сохраняются, только если связаны с сильными.</li>
+</ol>
+<pre><code>edges = cv2.Canny(gray, threshold1=50, threshold2=150)</code></pre>
+
+<h2 id="morphology">Морфологические операции</h2>
+<p>Морфология обрабатывает форму объектов на бинарных изображениях с помощью <strong>структурного элемента</strong> — небольшой маски, например квадрата 3 × 3 или диска <span class="ref">[<a href="sources.html#src-1">1</a>, гл. 9; <a href="sources.html#src-4">4</a>, гл. 3]</span>.</p>
+<ul>
+  <li><strong>Эрозия</strong> — пиксель остаётся белым, только если весь структурный элемент вокруг него лежит на объекте. Объекты утончаются, мелкие исчезают.</li>
+  <li><strong>Дилатация</strong> — пиксель становится белым, если структурный элемент задевает объект хотя бы одним пикселем. Объекты утолщаются, мелкие разрывы заполняются.</li>
+  <li><strong>Размыкание</strong> (opening) = эрозия, затем дилатация. Удаляет мелкий шум, сохраняя размер крупных объектов.</li>
+  <li><strong>Замыкание</strong> (closing) = дилатация, затем эрозия. Закрывает небольшие дыры и разрывы контуров.</li>
+</ul>
+
+<h2 id="geometry">Геометрические преобразования</h2>
+<p>Масштабирование, поворот, сдвиг и наклон описываются <strong>аффинным</strong> преобразованием с матрицей 2 × 3; оно сохраняет параллельность прямых и определяется тремя парами соответствующих точек. <strong>Перспективное</strong> преобразование (гомография) задаётся матрицей 3 × 3, определяется четырьмя парами точек и позволяет, например, «выпрямить» сфотографированный под углом документ <span class="ref">[<a href="sources.html#src-2">2</a>, гл. 3]</span>.</p>
+<p>Координаты после преобразования обычно нецелые, поэтому значение пикселя находят <strong>интерполяцией</strong>: по ближайшему соседу (быстро, но ступенчато), билинейной (по 4 соседям) или бикубической (по 16 соседям, наиболее гладко).</p>
+
+<h2 id="features">Особые точки и преобразование Хафа</h2>
+<p>Чтобы сопоставлять изображения — склеивать панорамы, отслеживать объекты, — находят <strong>особые точки</strong>: углы и пятна, которые надёжно обнаруживаются на разных снимках одной сцены. Детектор Харриса находит углы по собственным значениям матрицы вторых моментов градиента. Метод SIFT <span class="ref">[<a href="sources.html#src-31">31</a>]</span> строит для каждой точки дескриптор, устойчивый к масштабу и повороту; ORB — его быстрая свободная альтернатива <span class="ref">[<a href="sources.html#src-2">2</a>, гл. 7]</span>.</p>
+<p><strong>Преобразование Хафа</strong> находит прямые и окружности. Каждая граничная точка «голосует» за все прямые <code>ρ = x·cos θ + y·sin θ</code>, проходящие через неё; прямые, набравшие много голосов, считаются найденными <span class="ref">[<a href="sources.html#src-1">1</a>, гл. 10]</span>.</p>
+
+<h2 id="questions">Контрольные вопросы</h2>
+<ol class="qlist">
+  <li>Что такое точечное преобразование яркости? Приведите три примера.</li>
+  <li>Какую величину максимизирует метод Оцу и в каких случаях он работает плохо?</li>
+  <li>Почему медианный фильтр лучше гауссова справляется с шумом «соль и перец»?</li>
+  <li>Перечислите четыре шага детектора Кэнни и объясните назначение гистерезиса.</li>
+  <li>Чем размыкание отличается от замыкания? Приведите задачу для каждой операции.</li>
+  <li>Сколько пар точек нужно, чтобы задать аффинное и перспективное преобразования?</li>
+  <li>Чем CLAHE отличается от глобальной эквализации гистограммы?</li>
+</ol>
+
+<h2 id="exercises">Упражнения для самостоятельной работы</h2>
+<div class="exercise">
+  <h4>Упражнение 2.1. Медиана против среднего</h4>
+  <p>Для окрестности 3 × 3 с импульсной помехой в центре вычислите результат усредняющего и медианного фильтров. Окрестность: <code>10 12 11 / 13 255 12 / 11 10 14</code>.</p>
+</div>
+<div class="exercise">
+  <h4>Упражнение 2.2. Метод Оцу вручную</h4>
+  <p>Изображение содержит 4 уровня яркости 0, 1, 2, 3 с числом пикселей 6, 2, 3, 5 соответственно. Переберите пороги <code>t = 1, 2, 3</code> (класс 0: яркость &lt; t) и найдите оптимальный по Оцу.</p>
+</div>
+<div class="exercise">
+  <h4>Упражнение 2.3. Подсчёт монет</h4>
+  <p>Сфотографируйте несколько монет на контрастном фоне. Постройте конвейер: перевод в оттенки серого → гауссово сглаживание → бинаризация Оцу → размыкание → поиск контуров <code>cv2.findContours</code>. Выведите число найденных монет.</p>
+</div>
+<div class="exercise">
+  <h4>Упражнение 2.4. Пороги Кэнни</h4>
+  <p>Примените <code>cv2.Canny</code> к одной фотографии с тремя парами порогов: (20, 60), (50, 150), (100, 250). Опишите, как меняется число и связность границ.</p>
+</div>
+
+<details class="solution" open>
+  <summary>Пример выполнения упражнения 2.1</summary>
+  <div class="body">
+    <div class="matrices" style="margin-bottom:1rem">
+      <div><div class="matrix" style="grid-template-columns:repeat(3,auto)"><span>10</span><span>12</span><span>11</span><span>13</span><span class="hl3">255</span><span>12</span><span>11</span><span>10</span><span>14</span></div><div class="cap">Окрестность с помехой</div></div>
+    </div>
+    <p><strong>Усредняющий фильтр.</strong> Сумма значений: 10 + 12 + 11 + 13 + 255 + 12 + 11 + 10 + 14 = 348. Среднее: 348 / 9 ≈ 38,7, после округления <strong>39</strong>.</p>
+    <p><strong>Медианный фильтр.</strong> Упорядочим значения: 10, 10, 11, 11, <strong>12</strong>, 12, 13, 14, 255. Медиана — пятый элемент из девяти: <strong>12</strong>.</p>
+    <p><strong>Вывод.</strong> Соседние пиксели имеют яркость около 10–14. Усреднение «размазало» выброс: центральный пиксель (39) по-прежнему заметно светлее соседей, а помеха к тому же повлияла на результат фильтра в восьми соседних позициях. Медиана полностью отбросила выброс, потому что одно экстремальное значение не может сдвинуть середину упорядоченного ряда.</p>
+<pre><code>import numpy as np
+w = np.array([10, 12, 11, 13, 255, 12, 11, 10, 14])
+print(round(w.mean()), int(np.median(w)))   <span class="c"># 39 12</span></code></pre>
+  </div>
+</details>
+
+<nav class="pager" aria-label="Соседние разделы">
+<a class="prev" href="section-1.html"><small>Предыдущий раздел</small>1. Что такое изображение</a>
+<a class="next" href="section-3.html"><small>Следующий раздел</small>3. Свёртки</a>
+</nav>
+</article></main>
+</div>
+<footer class="site-footer">
+  <div class="site-footer__inner">
+    <span>ЭУМК «Основы компьютерного зрения». Автор: <a href="author.html">Гордова Анна</a>, 2026</span>
+    <span><a href="sources.html">Литература</a>&emsp;<a href="guide.html">Как пользоваться курсом</a></span>
+  </div>
+</footer>
+</body>
+</html>

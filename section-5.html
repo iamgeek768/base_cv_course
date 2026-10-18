@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Детекция объектов — Основы компьютерного зрения</title>
+<meta name="description" content="Раздел 5 курса «Основы компьютерного зрения»: детекция объектов.">
+<meta name="author" content="Гордова Анна">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Unbounded:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 3 3'%3E%3Crect width='1' height='1' fill='%23c8323f'/%3E%3Crect x='1' y='1' width='1' height='1' fill='%23157f69'/%3E%3Crect x='2' y='2' width='1' height='1' fill='%232453a6'/%3E%3C/svg%3E">
+<script src="assets/site.js"></script>
+</head>
+<body>
+<a class="skip" href="#main">Перейти к содержимому</a>
+<header class="site-header">
+  <div class="site-header__inner">
+    <a class="brand" href="index.html"><span class="brand__mark" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span>Основы компьютерного зрения</a>
+    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">Меню</button>
+    <nav class="site-nav" id="site-nav" aria-label="Основная навигация">
+      <ul>
+        <li><a href="index.html">Главная</a></li>
+        <li><a href="program.html">Программа</a></li>
+        <li><a href="section-1.html" aria-current="page">Лекции</a></li>
+        <li><a href="test.html">Тест</a></li>
+        <li><a href="practice.html">Практика</a></li>
+        <li><a href="sources.html">Литература</a></li>
+        <li><a href="guide.html">Руководство</a></li>
+        <li><a href="author.html">Об авторе</a></li>
+      </ul>
+    </nav>
+    <button class="theme-toggle" type="button"><span class="tt-icon" aria-hidden="true">◐</span><span class="tt-text">Тёмная тема</span></button>
+  </div>
+</header>
+<div class="layout">
+<aside class="sidebar" aria-label="Разделы курса">
+<h2>Разделы курса</h2>
+<ol>
+<li><a href="section-1.html"><span class="num">1</span><span>Что такое изображение</span></a></li>
+<li><a href="section-2.html"><span class="num">2</span><span>Классические методы обработки</span></a></li>
+<li><a href="section-3.html"><span class="num">3</span><span>Свёртки</span></a></li>
+<li><a href="section-4.html"><span class="num">4</span><span>Классификация на основе свёрток</span></a></li>
+<li><a href="section-5.html" aria-current="page"><span class="num">5</span><span>Детекция объектов</span></a></li>
+<li><a href="section-6.html"><span class="num">6</span><span>Сегментация изображений</span></a></li>
+</ol>
+<div class="toc-block"><h2>На этой странице</h2>
+<ul class="toc">
+<li><a href="#task">Постановка задачи</a></li>
+<li><a href="#iou">Пересечение по объединению</a></li>
+<li><a href="#nms">Подавление немаксимумов</a></li>
+<li><a href="#map">Метрика mAP</a></li>
+<li><a href="#classic">Классические детекторы</a></li>
+<li><a href="#two-stage">Двухстадийные детекторы</a></li>
+<li><a href="#one-stage">Одностадийные детекторы</a></li>
+<li><a href="#questions">Контрольные вопросы</a></li>
+<li><a href="#exercises">Упражнения для самостоятельной работы</a></li>
+</ul></div>
+</aside>
+<main id="main"><article class="prose">
+<div class="page-head">
+  <p class="kicker">Раздел 5 из 6, объём 12 ак. ч</p>
+  <h1>Детекция объектов</h1>
+  <p class="lead">Классификатор отвечает на вопрос «что изображено». Детектор отвечает сразу на два: какие объекты есть на изображении и где именно каждый из них находится.</p>
+</div>
+
+<h2 id="task">Постановка задачи</h2>
+<p>Детектор возвращает список объектов. Для каждого указываются <strong>класс</strong>, <strong>уверенность</strong> (число от 0 до 1) и <strong>ограничивающая рамка</strong> (bounding box) — прямоугольник со сторонами, параллельными осям изображения. Число объектов заранее неизвестно, и это главное отличие от классификации <span class="ref">[<a href="sources.html#src-2">2</a>, гл. 6]</span>.</p>
+<figure>
+  <div class="fig-box">
+    <svg viewBox="0 0 520 220" role="img" aria-labelledby="det-fig-t" style="display:block;width:100%;max-width:560px">
+      <title id="det-fig-t">Схема: изображение с двумя рамками — «собака 0,94» и «мяч 0,81»</title>
+      <rect x="1" y="1" width="518" height="218" rx="6" style="fill:var(--surface-2);stroke:var(--line)"/>
+      <path d="M0 180 L520 165 L520 220 L0 220 Z" opacity=".6" style="fill:var(--line)"/>
+      <ellipse cx="170" cy="130" rx="70" ry="38" opacity=".55" style="fill:var(--muted)"/>
+      <circle cx="235" cy="92" r="26" opacity=".55" style="fill:var(--muted)"/>
+      <rect x="120" y="150" width="12" height="35" opacity=".55" style="fill:var(--muted)"/>
+      <rect x="200" y="150" width="12" height="35" opacity=".55" style="fill:var(--muted)"/>
+      <circle cx="380" cy="160" r="24" opacity=".4" style="fill:var(--muted)"/>
+      <rect x="92" y="60" width="176" height="130" fill="none" stroke-width="3" style="stroke:var(--accent)"/>
+      <rect x="92" y="38" width="112" height="22" style="fill:var(--accent)"/>
+      <text x="100" y="54" font-family="Golos Text, sans-serif" font-size="14" style="fill:var(--surface)">собака 0,94</text>
+      <rect x="350" y="130" width="60" height="60" fill="none" stroke-width="3" style="stroke:var(--g)"/>
+      <rect x="350" y="108" width="84" height="22" style="fill:var(--g)"/>
+      <text x="357" y="124" font-family="Golos Text, sans-serif" font-size="14" style="fill:var(--surface)">мяч 0,81</text>
+    </svg>
+  </div>
+  <figcaption>Рис. 5.1. Результат детекции: класс, уверенность и рамка для каждого найденного объекта.</figcaption>
+</figure>
+<p>Рамку можно записать по-разному, и путаница форматов — частый источник ошибок:</p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Формат</th><th>Запись</th><th>Где используется</th></tr></thead>
+  <tbody>
+    <tr><td>Углы</td><td><code>(x<sub>min</sub>, y<sub>min</sub>, x<sub>max</sub>, y<sub>max</sub>)</code> в пикселях</td><td>Pascal VOC, torchvision</td></tr>
+    <tr><td>Угол и размер</td><td><code>(x<sub>min</sub>, y<sub>min</sub>, w, h)</code> в пикселях</td><td>COCO</td></tr>
+    <tr><td>Центр и размер</td><td><code>(x<sub>c</sub>, y<sub>c</sub>, w, h)</code>, нормированные на размер изображения</td><td>YOLO</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="iou">Пересечение по объединению</h2>
+<p>Чтобы понять, насколько предсказанная рамка совпадает с истинной, используют меру <strong>IoU</strong> (Intersection over Union), или индекс Жаккара <span class="ref">[<a href="sources.html#src-7">7</a>; <a href="sources.html#src-33">33</a>]</span>:</p>
+<div class="formula">IoU(A, B) = площадь(A ∩ B) / площадь(A ∪ B) = |A ∩ B| / (|A| + |B| − |A ∩ B|)</div>
+<p>IoU равен 1 при полном совпадении и 0, если рамки не пересекаются. Обычно предсказание считается верным при IoU ≥ 0,5.</p>
+
+<h2 id="nms">Подавление немаксимумов</h2>
+<p>Детектор, как правило, выдаёт несколько сильно перекрывающихся рамок для одного объекта. Алгоритм <strong>NMS</strong> (non-maximum suppression) оставляет из них одну:</p>
+<ol>
+  <li>отсортировать рамки класса по убыванию уверенности;</li>
+  <li>взять рамку с наибольшей уверенностью и добавить её в результат;</li>
+  <li>удалить все оставшиеся рамки, у которых IoU с ней больше порога (обычно 0,45–0,7);</li>
+  <li>повторять шаги 2–3, пока рамки не закончатся.</li>
+</ol>
+<pre><code>from torchvision.ops import nms
+keep = nms(boxes, scores, iou_threshold=0.5)   <span class="c"># индексы оставленных рамок</span></code></pre>
+
+<h2 id="map">Метрика mAP</h2>
+<p>Предсказания одного класса сортируют по уверенности. Каждое считается истинно положительным, если его IoU с ещё не сопоставленной истинной рамкой не меньше порога, иначе — ложноположительным. Двигаясь по списку, строят кривую «точность — полнота» (precision–recall). Площадь под ней — <strong>AP</strong> (average precision) для класса, а среднее по классам — <strong>mAP</strong> <span class="ref">[<a href="sources.html#src-32">32</a>; <a href="sources.html#src-33">33</a>]</span>.</p>
+<ul>
+  <li><strong>mAP@0,5</strong> — при пороге IoU 0,5, стандарт Pascal VOC (20 классов);</li>
+  <li><strong>mAP@[0,5:0,95]</strong> — среднее по десяти порогам от 0,5 до 0,95 с шагом 0,05, стандарт COCO (80 классов). Требует точной локализации.</li>
+</ul>
+
+<h2 id="classic">Классические детекторы</h2>
+<p><strong>Скользящее окно.</strong> Окно фиксированного размера проходит по изображению на нескольких масштабах, и для каждой позиции классификатор решает, есть ли там объект. Подход прост, но требует десятков тысяч вызовов классификатора.</p>
+<p><strong>Метод Виолы — Джонса</strong> (2001) <span class="ref">[<a href="sources.html#src-27">27</a>]</span> впервые позволил находить лица в реальном времени. Он использует простые признаки Хаара, которые быстро вычисляются по интегральному изображению, отбирает лучшие признаки алгоритмом AdaBoost и выстраивает классификаторы в каскад: большинство окон отбрасывается на первых, самых дешёвых ступенях.</p>
+<p><strong>HOG + SVM</strong> (2005) <span class="ref">[<a href="sources.html#src-28">28</a>]</span> описывает окно гистограммами направлений градиента в небольших ячейках и классифицирует его линейным SVM. Метод стал стандартом для обнаружения пешеходов до эпохи нейросетей.</p>
+
+<h2 id="two-stage">Двухстадийные детекторы</h2>
+<p>Двухстадийные детекторы сначала предлагают области, где может быть объект, а затем классифицируют каждую и уточняют её рамку.</p>
+<ul>
+  <li><strong>R-CNN</strong> (2014) <span class="ref">[<a href="sources.html#src-34">34</a>]</span>: около 2000 областей-кандидатов алгоритмом selective search, каждая отдельно прогоняется через CNN. Точно, но очень медленно.</li>
+  <li><strong>Fast R-CNN</strong> (2015): изображение проходит через CNN один раз, признаки областей вырезаются из общей карты признаков слоем RoI Pooling.</li>
+  <li><strong>Faster R-CNN</strong> (2015) <span class="ref">[<a href="sources.html#src-15">15</a>]</span>: области-кандидаты предлагает сама сеть — <em>Region Proposal Network</em>. В каждой точке карты признаков она оценивает набор <strong>якорей</strong> (anchors) — шаблонных рамок нескольких размеров и пропорций — и предсказывает, есть ли в якоре объект и как сместить его границы.</li>
+</ul>
+
+<h2 id="one-stage">Одностадийные детекторы</h2>
+<p>Одностадийные детекторы предсказывают классы и рамки за один проход сети, без отдельного этапа предложений. Они быстрее и подходят для работы с видео в реальном времени.</p>
+<ul>
+  <li><strong>YOLO</strong> (You Only Look Once, 2016) <span class="ref">[<a href="sources.html#src-16">16</a>]</span> делит изображение на сетку <code>S × S</code>. Каждая ячейка предсказывает несколько рамок с уверенностью и вероятности классов. В первой версии при <code>S = 7</code>, двух рамках на ячейку и 20 классах выход сети — тензор 7 × 7 × 30. Модель работала со скоростью около 45 кадров в секунду. Современные версии семейства развивает компания Ultralytics <span class="ref">[<a href="sources.html#src-21">21</a>]</span>.</li>
+  <li><strong>SSD</strong> (2016) предсказывает объекты на картах признаков нескольких масштабов: крупные карты отвечают за мелкие объекты, мелкие — за крупные.</li>
+  <li><strong>RetinaNet</strong> (2017) <span class="ref">[<a href="sources.html#src-24">24</a>]</span> решает проблему дисбаланса: фоновых якорей в тысячи раз больше, чем якорей с объектами. Функция потерь <em>focal loss</em> <code>FL = −(1 − p<sub>t</sub>)<sup>γ</sup> · log p<sub>t</sub></code> уменьшает вклад лёгких, уверенно классифицированных примеров.</li>
+  <li><strong>Безъякорные</strong> детекторы (FCOS, CenterNet) предсказывают центр объекта и расстояния до его границ без шаблонных рамок.</li>
+  <li><strong>DETR</strong> (2020) <span class="ref">[<a href="sources.html#src-25">25</a>]</span> формулирует детекцию как предсказание множества объектов трансформером. Предсказания сопоставляются с разметкой венгерским алгоритмом, поэтому NMS не нужен.</li>
+</ul>
+<pre><code>from ultralytics import YOLO
+
+model = YOLO("yolo11n.pt")             <span class="c"># маленькая модель, предобучена на COCO</span>
+result = model("street.jpg")[0]
+for box in result.boxes:
+    print(result.names[int(box.cls)], float(box.conf), box.xyxy.tolist())
+result.save("street_detected.jpg")</code></pre>
+<div class="note"><p>Двухстадийные детекторы исторически точнее, одностадийные — быстрее. Современные одностадийные модели почти сравнялись с двухстадийными по точности, поэтому в прикладных задачах чаще всего начинают с YOLO.</p></div>
+
+<h2 id="questions">Контрольные вопросы</h2>
+<ol class="qlist">
+  <li>Чем задача детекции отличается от классификации? Что возвращает детектор?</li>
+  <li>Как вычисляется IoU? Чему он равен для непересекающихся рамок?</li>
+  <li>Зачем нужен алгоритм NMS? Опишите его шаги.</li>
+  <li>Чем mAP@0,5 отличается от mAP@[0,5:0,95]?</li>
+  <li>Какие идеи лежат в основе метода Виолы — Джонса?</li>
+  <li>Что такое якоря и как их использует Region Proposal Network?</li>
+  <li>В чём основное различие двухстадийных и одностадийных детекторов?</li>
+  <li>Какую проблему решает focal loss?</li>
+</ol>
+
+<h2 id="exercises">Упражнения для самостоятельной работы</h2>
+<div class="exercise">
+  <h4>Упражнение 5.1. IoU и NMS вручную</h4>
+  <p>Детектор выдал три рамки класса «собака» в формате <code>(x<sub>min</sub>, y<sub>min</sub>, x<sub>max</sub>, y<sub>max</sub>)</code>: A = (10, 10, 50, 50) с уверенностью 0,9; B = (12, 14, 52, 54) с уверенностью 0,8; C = (60, 60, 100, 100) с уверенностью 0,7. Выполните NMS с порогом IoU = 0,5.</p>
+</div>
+<div class="exercise">
+  <h4>Упражнение 5.2. Своя функция NMS</h4>
+  <p>Реализуйте NMS на NumPy и сравните результат с <code>torchvision.ops.nms</code> на 1000 случайных рамках.</p>
+</div>
+<div class="exercise">
+  <h4>Упражнение 5.3. Анализ ошибок детектора</h4>
+  <p>Запустите предобученную модель YOLO на 20 собственных фотографиях. Выпишите пропущенные объекты и ложные срабатывания и сгруппируйте ошибки по причинам: малый размер, перекрытие, необычный ракурс, плохое освещение.</p>
+</div>
+<div class="exercise">
+  <h4>Упражнение 5.4. Конвертация разметки</h4>
+  <p>Напишите функцию, переводящую рамку из формата Pascal VOC в формат YOLO. Проверьте её на рамке (100, 50, 300, 250) для изображения 640 × 480.</p>
+</div>
+
+<details class="solution" open>
+  <summary>Пример выполнения упражнения 5.1</summary>
+  <div class="body">
+    <p>Площадь каждой рамки: 40 · 40 = 1600.</p>
+    <p><strong>IoU(A, B).</strong> Пересечение по x: от max(10, 12) = 12 до min(50, 52) = 50, ширина 38. По y: от 14 до 50, высота 36. Площадь пересечения 38 · 36 = 1368.</p>
+    <div class="formula">IoU(A, B) = 1368 / (1600 + 1600 − 1368) = 1368 / 1832 ≈ 0,747</div>
+    <p><strong>IoU(A, C).</strong> По x: от 60 до 50 — отрезок пуст, рамки не пересекаются, IoU = 0.</p>
+    <p><strong>NMS.</strong></p>
+    <ol>
+      <li>Порядок по уверенности: A (0,9), B (0,8), C (0,7).</li>
+      <li>Берём A в результат.</li>
+      <li>IoU(A, B) = 0,747 &gt; 0,5 — B удаляется как дубликат. IoU(A, C) = 0 — C остаётся.</li>
+      <li>Берём C в результат. Рамок больше нет.</li>
+    </ol>
+    <p><strong>Ответ:</strong> остаются рамки A и C — две собаки.</p>
+<pre><code>import torch
+from torchvision.ops import box_iou, nms
+boxes = torch.tensor([[10, 10, 50, 50], [12, 14, 52, 54], [60, 60, 100, 100]], dtype=torch.float)
+scores = torch.tensor([0.9, 0.8, 0.7])
+print(box_iou(boxes[:1], boxes))          <span class="c"># tensor([[1.0000, 0.7467, 0.0000]])</span>
+print(nms(boxes, scores, 0.5))            <span class="c"># tensor([0, 2])</span></code></pre>
+  </div>
+</details>
+
+<nav class="pager" aria-label="Соседние разделы">
+<a class="prev" href="section-4.html"><small>Предыдущий раздел</small>4. Классификация на основе свёрток</a>
+<a class="next" href="section-6.html"><small>Следующий раздел</small>6. Сегментация изображений</a>
+</nav>
+</article></main>
+</div>
+<footer class="site-footer">
+  <div class="site-footer__inner">
+    <span>ЭУМК «Основы компьютерного зрения». Автор: <a href="author.html">Гордова Анна</a>, 2026</span>
+    <span><a href="sources.html">Литература</a>&emsp;<a href="guide.html">Как пользоваться курсом</a></span>
+  </div>
+</footer>
+</body>
+</html>

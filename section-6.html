@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Сегментация изображений — Основы компьютерного зрения</title>
+<meta name="description" content="Раздел 6 курса «Основы компьютерного зрения»: сегментация изображений.">
+<meta name="author" content="Гордова Анна">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Unbounded:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 3 3'%3E%3Crect width='1' height='1' fill='%23c8323f'/%3E%3Crect x='1' y='1' width='1' height='1' fill='%23157f69'/%3E%3Crect x='2' y='2' width='1' height='1' fill='%232453a6'/%3E%3C/svg%3E">
+<script src="assets/site.js"></script>
+</head>
+<body>
+<a class="skip" href="#main">Перейти к содержимому</a>
+<header class="site-header">
+  <div class="site-header__inner">
+    <a class="brand" href="index.html"><span class="brand__mark" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span>Основы компьютерного зрения</a>
+    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">Меню</button>
+    <nav class="site-nav" id="site-nav" aria-label="Основная навигация">
+      <ul>
+        <li><a href="index.html">Главная</a></li>
+        <li><a href="program.html">Программа</a></li>
+        <li><a href="section-1.html" aria-current="page">Лекции</a></li>
+        <li><a href="test.html">Тест</a></li>
+        <li><a href="practice.html">Практика</a></li>
+        <li><a href="sources.html">Литература</a></li>
+        <li><a href="guide.html">Руководство</a></li>
+        <li><a href="author.html">Об авторе</a></li>
+      </ul>
+    </nav>
+    <button class="theme-toggle" type="button"><span class="tt-icon" aria-hidden="true">◐</span><span class="tt-text">Тёмная тема</span></button>
+  </div>
+</header>
+<div class="layout">
+<aside class="sidebar" aria-label="Разделы курса">
+<h2>Разделы курса</h2>
+<ol>
+<li><a href="section-1.html"><span class="num">1</span><span>Что такое изображение</span></a></li>
+<li><a href="section-2.html"><span class="num">2</span><span>Классические методы обработки</span></a></li>
+<li><a href="section-3.html"><span class="num">3</span><span>Свёртки</span></a></li>
+<li><a href="section-4.html"><span class="num">4</span><span>Классификация на основе свёрток</span></a></li>
+<li><a href="section-5.html"><span class="num">5</span><span>Детекция объектов</span></a></li>
+<li><a href="section-6.html" aria-current="page"><span class="num">6</span><span>Сегментация изображений</span></a></li>
+</ol>
+<div class="toc-block"><h2>На этой странице</h2>
+<ul class="toc">
+<li><a href="#types">Виды сегментации</a></li>
+<li><a href="#classic">Классические методы</a></li>
+<li><a href="#fcn">Полностью свёрточные сети</a></li>
+<li><a href="#unet">U-Net</a></li>
+<li><a href="#deeplab">DeepLab и расширенные свёртки</a></li>
+<li><a href="#instance">Экземплярная сегментация: Mask R-CNN</a></li>
+<li><a href="#sam">Модели-основы: Segment Anything</a></li>
+<li><a href="#metrics">Функции потерь и метрики</a></li>
+<li><a href="#questions">Контрольные вопросы</a></li>
+<li><a href="#exercises">Упражнения для самостоятельной работы</a></li>
+</ul></div>
+</aside>
+<main id="main"><article class="prose">
+<div class="page-head">
+  <p class="kicker">Раздел 6 из 6, объём 12 ак. ч</p>
+  <h1>Сегментация изображений</h1>
+  <p class="lead">Рамка детектора приблизительна: в неё попадает фон. Сегментация точнее — она относит к объекту или классу каждый пиксель изображения.</p>
+</div>
+
+<h2 id="types">Виды сегментации</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Вид</th><th>Что предсказывается</th><th>Пример</th></tr></thead>
+  <tbody>
+    <tr><td>Семантическая</td><td>Класс каждого пикселя. Объекты одного класса не различаются</td><td>Все пиксели людей помечены «человек»</td></tr>
+    <tr><td>Экземплярная (instance)</td><td>Отдельная маска для каждого объекта</td><td>«человек 1», «человек 2», «человек 3»</td></tr>
+    <tr><td>Паноптическая</td><td>Объединение двух предыдущих: экземпляры для исчисляемых объектов и классы для фона вроде неба и дороги</td><td>Автопилот: каждая машина отдельно, плюс дорога, тротуар, небо</td></tr>
+  </tbody>
+</table>
+</div>
+<p>Результат сегментации — <strong>маска</strong>: изображение того же размера, где в каждом пикселе записан номер класса или объекта. Маски хранят в формате PNG, поскольку сжатие JPEG исказило бы номера классов на границах (см. <a href="section-1.html#formats">раздел 1</a>).</p>
+
+<h2 id="classic">Классические методы</h2>
+<ul>
+  <li><strong>Пороговая сегментация</strong> — бинаризация, например методом Оцу (<a href="section-2.html#threshold">раздел 2</a>). Работает, когда объект и фон различаются по яркости.</li>
+  <li><strong>Наращивание областей</strong> (region growing) — от начальных точек-«семян» к области присоединяются соседние пиксели, близкие по яркости или цвету <span class="ref">[<a href="sources.html#src-1">1</a>, гл. 10]</span>.</li>
+  <li><strong>Водораздел</strong> (watershed) — изображение (обычно модуль градиента) рассматривается как рельеф, который заполняется водой из минимумов; линии встречи «бассейнов» — границы областей. С маркерами, полученными из преобразования расстояний, метод разделяет слипшиеся объекты: клетки, монеты, зёрна <span class="ref">[<a href="sources.html#src-8">8</a>]</span>.</li>
+  <li><strong>Кластеризация k-средних</strong> — пиксели группируются по цвету (и, возможно, координатам) в <code>k</code> кластеров.</li>
+  <li><strong>GrabCut</strong> — пользователь обводит объект рамкой, а алгоритм моделирует цвета объекта и фона и находит оптимальную границу разрезом графа <span class="ref">[<a href="sources.html#src-2">2</a>, гл. 4]</span>.</li>
+</ul>
+<p>Классические методы не требуют обучения, но не знают, что такое «человек» или «машина»: они опираются только на яркость, цвет и границы.</p>
+
+<h2 id="fcn">Полностью свёрточные сети</h2>
+<p>Сеть FCN (2015) <span class="ref">[<a href="sources.html#src-17">17</a>]</span> впервые решила семантическую сегментацию нейросетью, обучаемой целиком. Идеи FCN:</p>
+<ol>
+  <li>взять классификационную сеть и заменить полносвязные слои свёртками 1 × 1 — тогда сеть принимает изображения любого размера и выдаёт не один вектор, а карту оценок классов;</li>
+  <li>эта карта в 32 раза меньше входа, поэтому её увеличивают до исходного размера <strong>транспонированной свёрткой</strong> с обучаемыми весами;</li>
+  <li>чтобы вернуть мелкие детали, к увеличенной карте добавляют предсказания с более ранних слоёв, где разрешение выше (skip-связи).</li>
+</ol>
+<p>Транспонированная свёртка — обратная по размерам операция: она увеличивает карту признаков. Размер её выхода:</p>
+<div class="formula">O = (N − 1) · S − 2P + K</div>
+
+<h2 id="unet">U-Net</h2>
+<p>Архитектура U-Net (2015) <span class="ref">[<a href="sources.html#src-18">18</a>]</span> создана для сегментации медицинских снимков и стала стандартом для задач с небольшим объёмом данных.</p>
+<figure>
+  <div class="fig-box">
+    <svg viewBox="0 0 560 230" role="img" aria-labelledby="unet-t" style="display:block;width:100%;max-width:600px">
+      <title id="unet-t">Схема U-Net: кодировщик уменьшает разрешение, декодер восстанавливает, skip-связи передают признаки между уровнями</title>
+      <g style="fill:var(--accent-soft);stroke:var(--accent)" stroke-width="1.5">
+        <rect x="20" y="20" width="24" height="70"/><rect x="80" y="70" width="30" height="55"/><rect x="146" y="115" width="36" height="40"/>
+        <rect x="262" y="160" width="40" height="50"/>
+        <rect x="378" y="115" width="36" height="40"/><rect x="450" y="70" width="30" height="55"/><rect x="516" y="20" width="24" height="70"/>
+      </g>
+      <g style="stroke:var(--muted)" stroke-width="1.5" fill="none">
+        <path d="M44 70 L80 92"/><path d="M110 115 L146 130"/><path d="M182 150 L262 180"/>
+        <path d="M302 180 L378 150"/><path d="M414 130 L450 115"/><path d="M480 92 L516 70"/>
+      </g>
+      <g style="stroke:var(--g)" stroke-width="2" stroke-dasharray="6 4" fill="none">
+        <path d="M44 45 L516 45"/><path d="M110 90 L450 90"/><path d="M182 132 L378 132"/>
+      </g>
+      <g font-family="Golos Text, sans-serif" font-size="13" style="fill:var(--muted)">
+        <text x="40" y="190">кодировщик</text><text x="430" y="190">декодер</text>
+        <text x="250" y="38" style="fill:var(--g)">skip-связи</text>
+      </g>
+    </svg>
+  </div>
+  <figcaption>Рис. 6.1. Схема U-Net. Кодировщик сжимает изображение и извлекает признаки, декодер восстанавливает разрешение. Пунктир — skip-связи: признаки кодировщика конкатенируются с признаками декодера того же масштаба.</figcaption>
+</figure>
+<ul>
+  <li><strong>Кодировщик</strong> — блоки «две свёртки 3 × 3 → max pooling»; разрешение уменьшается, число каналов растёт.</li>
+  <li><strong>Декодер</strong> — блоки «транспонированная свёртка → конкатенация со skip-связью → две свёртки»; разрешение восстанавливается.</li>
+  <li><strong>Skip-связи</strong> передают в декодер точную информацию о расположении границ, которая теряется при сжатии.</li>
+</ul>
+<p>Благодаря skip-связям и интенсивной аугментации авторы обучили сеть всего на 30 размеченных снимках.</p>
+
+<h2 id="deeplab">DeepLab и расширенные свёртки</h2>
+<p>Семейство DeepLab <span class="ref">[<a href="sources.html#src-29">29</a>]</span> вместо многократного уменьшения разрешения использует <strong>расширенные</strong> (atrous, dilated) свёртки: элементы ядра расставлены с промежутками, поэтому рецептивное поле растёт без потери разрешения и без новых весов. Модуль <strong>ASPP</strong> применяет параллельно несколько свёрток с разными коэффициентами расширения и учитывает контекст на нескольких масштабах.</p>
+<pre><code>from torchvision.models.segmentation import deeplabv3_resnet50, DeepLabV3_ResNet50_Weights
+
+weights = DeepLabV3_ResNet50_Weights.DEFAULT
+model = deeplabv3_resnet50(weights=weights).eval()
+batch = weights.transforms()(img).unsqueeze(0)    <span class="c"># img — тензор (3, H, W)</span>
+logits = model(batch)["out"]                       <span class="c"># (1, 21, H', W'): 21 класс Pascal VOC</span>
+mask = logits.argmax(dim=1)[0]                     <span class="c"># номер класса в каждом пикселе</span></code></pre>
+
+<h2 id="instance">Экземплярная сегментация: Mask R-CNN</h2>
+<p>Mask R-CNN (2017) <span class="ref">[<a href="sources.html#src-19">19</a>]</span> расширяет детектор Faster R-CNN из <a href="section-5.html#two-stage">раздела 5</a>: к ветвям классификации и уточнения рамки добавляется третья, которая предсказывает бинарную маску 28 × 28 внутри каждой найденной рамки. Чтобы маска точно совпадала с объектом, грубое округление координат в RoI Pooling заменено на <strong>RoIAlign</strong> с билинейной интерполяцией.</p>
+
+<h2 id="sam">Модели-основы: Segment Anything</h2>
+<p>Модель SAM (2023) <span class="ref">[<a href="sources.html#src-23">23</a>]</span> сегментирует объект по подсказке: точке, рамке или грубой маске. Она обучена на наборе SA-1B, содержащем более миллиарда масок на 11 млн изображений, и работает с объектами, которых не видела при обучении. SAM не называет класс объекта, поэтому её часто комбинируют с детектором: детектор находит рамку, SAM строит по ней точную маску. Также модель ускоряет разметку данных.</p>
+
+<h2 id="metrics">Функции потерь и метрики</h2>
+<p>Сегментация — это классификация каждого пикселя, поэтому базовая функция потерь — <strong>попиксельная кросс-энтропия</strong>. Если объект занимает малую долю изображения, к ней добавляют <strong>Dice loss</strong> = 1 − Dice, которая меньше зависит от дисбаланса классов.</p>
+<div class="formula">IoU = |A ∩ B| / |A ∪ B|        Dice = 2·|A ∩ B| / (|A| + |B|)        Dice = 2·IoU / (1 + IoU)
+<span class="where">A — предсказанная маска, B — истинная, |·| — число пикселей. mIoU — среднее IoU по всем классам.</span></div>
+<p><strong>Попиксельная точность</strong> (pixel accuracy) обманчива: если фон занимает 95 % изображения, модель, предсказывающая один фон, получит 95 %. Поэтому основная метрика семантической сегментации — <strong>mIoU</strong>, а в медицинских задачах — <strong>коэффициент Dice</strong>.</p>
+
+<h2 id="questions">Контрольные вопросы</h2>
+<ol class="qlist">
+  <li>Чем семантическая сегментация отличается от экземплярной и паноптической?</li>
+  <li>Как работает алгоритм водораздела и почему без маркеров он даёт пересегментацию?</li>
+  <li>Какие изменения в классификационной сети сделали авторы FCN?</li>
+  <li>Зачем в U-Net нужны skip-связи?</li>
+  <li>Что такое расширенная свёртка и какое преимущество она даёт?</li>
+  <li>Что добавляет Mask R-CNN к Faster R-CNN и зачем нужен RoIAlign?</li>
+  <li>Почему попиксельная точность — плохая метрика для сегментации? Какие метрики лучше?</li>
+</ol>
+
+<h2 id="exercises">Упражнения для самостоятельной работы</h2>
+<div class="exercise">
+  <h4>Упражнение 6.1. IoU и Dice</h4>
+  <p>Вычислите IoU и коэффициент Dice для предсказанной маски P и истинной маски G размером 4 × 4.</p>
+  <div class="matrices">
+    <div><div class="matrix" style="grid-template-columns:repeat(4,auto)"><span>0</span><span>1</span><span>1</span><span>1</span><span>0</span><span>1</span><span>1</span><span>0</span><span>0</span><span>0</span><span>1</span><span>0</span><span>0</span><span>0</span><span>0</span><span>0</span></div><div class="cap">Предсказание P</div></div>
+    <div><div class="matrix" style="grid-template-columns:repeat(4,auto)"><span>0</span><span>1</span><span>1</span><span>0</span><span>0</span><span>1</span><span>1</span><span>0</span><span>0</span><span>1</span><span>1</span><span>0</span><span>0</span><span>0</span><span>0</span><span>0</span></div><div class="cap">Разметка G</div></div>
+  </div>
+</div>
+<div class="exercise">
+  <h4>Упражнение 6.2. Разделение слипшихся объектов</h4>
+  <p>Сфотографируйте касающиеся друг друга монеты. Сегментируйте их методом Оцу, затем разделите алгоритмом водораздела с маркерами из преобразования расстояний (<code>cv2.distanceTransform</code>, <code>cv2.watershed</code>). Сравните число найденных монет до и после водораздела.</p>
+</div>
+<div class="exercise">
+  <h4>Упражнение 6.3. Транспонированная свёртка</h4>
+  <p>Карта признаков 16 × 16 подаётся на транспонированную свёртку с <code>K = 4, S = 2, P = 1</code>. Найдите размер выхода и проверьте ответ с помощью <code>nn.ConvTranspose2d</code>.</p>
+</div>
+<div class="exercise">
+  <h4>Упражнение 6.4. Готовая модель на своих данных</h4>
+  <p>Примените DeepLabV3 из torchvision к пяти собственным фотографиям. Наложите маски на изображения полупрозрачным цветом и опишите, на каких классах и границах модель ошибается.</p>
+</div>
+
+<details class="solution" open>
+  <summary>Пример выполнения упражнения 6.1</summary>
+  <div class="body">
+    <p>Посчитаем число единиц в каждой маске: |P| = 3 + 2 + 1 = 6, |G| = 2 + 2 + 2 = 6.</p>
+    <p>Пересечение — пиксели, где обе маски равны 1:</p>
+    <div class="matrices" style="margin-bottom:1rem">
+      <div><div class="matrix" style="grid-template-columns:repeat(4,auto)"><span>0</span><span class="hl2">1</span><span class="hl2">1</span><span class="hl3">0</span><span>0</span><span class="hl2">1</span><span class="hl2">1</span><span>0</span><span>0</span><span class="hl3">0</span><span class="hl2">1</span><span>0</span><span>0</span><span>0</span><span>0</span><span>0</span></div><div class="cap">Зелёные — совпадения (5), красные — расхождения (2)</div></div>
+    </div>
+    <p>|P ∩ G| = 2 + 2 + 1 = 5. Объединение |P ∪ G| = |P| + |G| − |P ∩ G| = 6 + 6 − 5 = 7.</p>
+    <div class="formula">IoU = 5 / 7 ≈ 0,714        Dice = 2 · 5 / (6 + 6) = 10 / 12 ≈ 0,833</div>
+    <p>Проверка по формуле связи: 2 · 0,714 / (1 + 0,714) ≈ 0,833. Dice всегда не меньше IoU, поэтому при сравнении моделей важно не смешивать эти метрики.</p>
+<pre><code>import numpy as np
+P = np.array([[0,1,1,1],[0,1,1,0],[0,0,1,0],[0,0,0,0]], bool)
+G = np.array([[0,1,1,0],[0,1,1,0],[0,1,1,0],[0,0,0,0]], bool)
+inter, union = (P & G).sum(), (P | G).sum()
+print(inter / union, 2 * inter / (P.sum() + G.sum()))   <span class="c"># 0.714… 0.833…</span></code></pre>
+  </div>
+</details>
+
+<nav class="pager" aria-label="Соседние разделы">
+<a class="prev" href="section-5.html"><small>Предыдущий раздел</small>5. Детекция объектов</a>
+<a class="next" href="test.html"><small>Дальше</small>Итоговый тест</a>
+</nav>
+</article></main>
+</div>
+<footer class="site-footer">
+  <div class="site-footer__inner">
+    <span>ЭУМК «Основы компьютерного зрения». Автор: <a href="author.html">Гордова Анна</a>, 2026</span>
+    <span><a href="sources.html">Литература</a>&emsp;<a href="guide.html">Как пользоваться курсом</a></span>
+  </div>
+</footer>
+</body>
+</html>

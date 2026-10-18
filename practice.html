@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Практические задания — Основы компьютерного зрения</title>
+<meta name="description" content="Комплекс практических заданий, критерии и шкала оценивания.">
+<meta name="author" content="Гордова Анна">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Unbounded:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 3 3'%3E%3Crect width='1' height='1' fill='%23c8323f'/%3E%3Crect x='1' y='1' width='1' height='1' fill='%23157f69'/%3E%3Crect x='2' y='2' width='1' height='1' fill='%232453a6'/%3E%3C/svg%3E">
+<script src="assets/site.js"></script>
+</head>
+<body>
+<a class="skip" href="#main">Перейти к содержимому</a>
+<header class="site-header">
+  <div class="site-header__inner">
+    <a class="brand" href="index.html"><span class="brand__mark" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span>Основы компьютерного зрения</a>
+    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">Меню</button>
+    <nav class="site-nav" id="site-nav" aria-label="Основная навигация">
+      <ul>
+        <li><a href="index.html">Главная</a></li>
+        <li><a href="program.html">Программа</a></li>
+        <li><a href="section-1.html">Лекции</a></li>
+        <li><a href="test.html">Тест</a></li>
+        <li><a href="practice.html" aria-current="page">Практика</a></li>
+        <li><a href="sources.html">Литература</a></li>
+        <li><a href="guide.html">Руководство</a></li>
+        <li><a href="author.html">Об авторе</a></li>
+      </ul>
+    </nav>
+    <button class="theme-toggle" type="button"><span class="tt-icon" aria-hidden="true">◐</span><span class="tt-text">Тёмная тема</span></button>
+  </div>
+</header>
+<main id="main" class="page">
+<div class="page-head">
+  <h1>Практические задания</h1>
+  <p class="lead">Пять работ проверяют умения и навыки, полученные в курсе. Каждая работа выполняется на Python в Jupyter Notebook или Google Colab и защищается у преподавателя.</p>
+  <div class="meta-row">
+    <span>Работ: <b>5</b></span>
+    <span>Максимум за работу: <b>20 баллов</b></span>
+    <span>Максимум за практику: <b>100 баллов</b></span>
+  </div>
+</div>
+
+<div class="prose">
+<h2 id="requirements">Общие требования</h2>
+<ul>
+  <li>Результат работы — ноутбук <code>.ipynb</code>, который выполняется сверху вниз без ошибок, и краткий отчёт: цель, ход работы, результаты в виде таблиц и рисунков, выводы.</li>
+  <li>Случайные генераторы фиксируются (<code>seed</code>), чтобы результаты можно было воспроизвести.</li>
+  <li>Использованные наборы данных и предобученные модели указываются со ссылками.</li>
+  <li>На защите студент объясняет код и отвечает на 2–3 вопроса из контрольных вопросов соответствующего раздела.</li>
+</ul>
+
+<h2 id="pr1">Работа 1. Предобработка и улучшение изображений</h2>
+<p><strong>Разделы:</strong> <a href="section-1.html">1</a>, <a href="section-2.html">2</a>. <strong>Инструменты:</strong> OpenCV, NumPy, Matplotlib.</p>
+<p><strong>Задание.</strong> Подберите 5 изображений с недостатками: низкий контраст, тёмная съёмка, шум. Для каждого постройте гистограмму и улучшите контраст линейным растяжением, эквализацией и CLAHE. Добавьте к одному чистому изображению гауссов и импульсный шум, подавите его усредняющим, гауссовым, медианным и билатеральным фильтрами и сравните результаты по метрике PSNR. На изображении с несколькими объектами выделите границы детектором Кэнни и подсчитайте объекты через бинаризацию Оцу, морфологию и поиск контуров.</p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Критерий</th><th class="n">Баллы</th></tr></thead>
+  <tbody>
+    <tr><td>Изображения загружены и показаны корректно (порядок каналов, гистограммы)</td><td class="n">3</td></tr>
+    <tr><td>Три способа улучшения контраста применены и сравнены</td><td class="n">4</td></tr>
+    <tr><td>Шумоподавление: четыре фильтра, два вида шума, таблица PSNR, обоснован лучший фильтр</td><td class="n">5</td></tr>
+    <tr><td>Границы Кэнни и подсчёт объектов дают верный результат</td><td class="n">5</td></tr>
+    <tr><td>Выводы и оформление отчёта</td><td class="n">3</td></tr>
+  </tbody>
+  <tfoot><tr><td>Итого</td><td class="n">20</td></tr></tfoot>
+</table>
+</div>
+
+<h2 id="pr2">Работа 2. Свёртка своими руками</h2>
+<p><strong>Раздел:</strong> <a href="section-3.html">3</a>. <strong>Инструменты:</strong> NumPy, OpenCV.</p>
+<p><strong>Задание.</strong> Реализуйте функцию <code>conv2d(img, kernel, padding, stride)</code> без готовых функций свёртки и корреляции. Сравните её результат с <code>cv2.filter2D</code> на ядрах усреднения, Гаусса, резкости, Собеля и Лапласа: максимальное расхождение должно быть меньше 10<sup>−4</sup>. Проверьте формулу размера выхода на пяти комбинациях отступа и шага. Сравните время двумерной свёртки с гауссовым ядром 15 × 15 и двух одномерных свёрток.</p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Критерий</th><th class="n">Баллы</th></tr></thead>
+  <tbody>
+    <tr><td>Функция <code>conv2d</code> верно работает при любых отступе и шаге</td><td class="n">8</td></tr>
+    <tr><td>Совпадение с OpenCV на пяти ядрах подтверждено численно</td><td class="n">4</td></tr>
+    <tr><td>Сепарабельная свёртка реализована, время измерено и объяснено</td><td class="n">4</td></tr>
+    <tr><td>Визуализация результатов и выводы</td><td class="n">4</td></tr>
+  </tbody>
+  <tfoot><tr><td>Итого</td><td class="n">20</td></tr></tfoot>
+</table>
+</div>
+
+<h2 id="pr3">Работа 3. Классификация изображений CIFAR-10</h2>
+<p><strong>Раздел:</strong> <a href="section-4.html">4</a>. <strong>Инструменты:</strong> PyTorch, torchvision.</p>
+<p><strong>Задание.</strong> Разделите обучающую часть CIFAR-10 на обучающую и валидационную выборки. Спроектируйте и обучите собственную свёрточную сеть с нормализацией по батчу и аугментацией; точность на тестовой выборке должна быть не ниже 70 %. Затем дообучите предобученную ResNet-18 и добейтесь точности не ниже 85 %. Постройте кривые обучения, матрицу ошибок и таблицу precision, recall и F1 по классам.</p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Критерий</th><th class="n">Баллы</th></tr></thead>
+  <tbody>
+    <tr><td>Подготовка данных: разбиение, нормализация, аугментации</td><td class="n">3</td></tr>
+    <tr><td>Собственная сеть обучена, точность на тесте не ниже 70 %</td><td class="n">6</td></tr>
+    <tr><td>Перенос обучения ResNet-18, точность не ниже 85 %</td><td class="n">5</td></tr>
+    <tr><td>Анализ: кривые обучения, матрица ошибок, метрики по классам</td><td class="n">4</td></tr>
+    <tr><td>Выводы: сравнение моделей, самые трудные классы и причины</td><td class="n">2</td></tr>
+  </tbody>
+  <tfoot><tr><td>Итого</td><td class="n">20</td></tr></tfoot>
+</table>
+</div>
+
+<h2 id="pr4">Работа 4. Детекция объектов</h2>
+<p><strong>Раздел:</strong> <a href="section-5.html">5</a>. <strong>Инструменты:</strong> PyTorch, Ultralytics YOLO, CVAT или Label Studio.</p>
+<p><strong>Задание.</strong> Реализуйте функции IoU и NMS на NumPy и проверьте их на совпадение с <code>torchvision.ops</code>. Запустите предобученную модель YOLO на 20 собственных фотографиях и проанализируйте её ошибки. Выберите класс объектов, которого нет в COCO (например, определённый вид инструментов или знаков), разметьте не менее 60 изображений, дообучите YOLO и вычислите mAP@0,5 и mAP@[0,5:0,95] на валидационной выборке.</p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Критерий</th><th class="n">Баллы</th></tr></thead>
+  <tbody>
+    <tr><td>IoU и NMS реализованы и проверены</td><td class="n">5</td></tr>
+    <tr><td>Анализ ошибок предобученной модели с группировкой по причинам</td><td class="n">4</td></tr>
+    <tr><td>Набор размечен, модель дообучена</td><td class="n">7</td></tr>
+    <tr><td>Метрики mAP вычислены, примеры удачных и ошибочных детекций, выводы</td><td class="n">4</td></tr>
+  </tbody>
+  <tfoot><tr><td>Итого</td><td class="n">20</td></tr></tfoot>
+</table>
+</div>
+
+<h2 id="pr5">Работа 5. Сегментация изображений</h2>
+<p><strong>Раздел:</strong> <a href="section-6.html">6</a>. <strong>Инструменты:</strong> OpenCV, PyTorch, torchvision.</p>
+<p><strong>Задание.</strong> Разделите слипшиеся объекты на фотографии алгоритмом водораздела с маркерами. Реализуйте U-Net и обучите её на наборе Oxford-IIIT Pet (трёхклассовые маски: животное, фон, граница) при разрешении 128 × 128; mIoU на тестовой выборке должен быть не ниже 0,65. Сами реализуйте метрики IoU и Dice, сравните свою модель с предобученной DeepLabV3 на 10 изображениях.</p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Критерий</th><th class="n">Баллы</th></tr></thead>
+  <tbody>
+    <tr><td>Классическая сегментация водоразделом разделяет объекты</td><td class="n">5</td></tr>
+    <tr><td>U-Net реализована и обучена, кривые обучения</td><td class="n">7</td></tr>
+    <tr><td>Метрики реализованы, mIoU на тесте не ниже 0,65</td><td class="n">5</td></tr>
+    <tr><td>Визуализация масок, сравнение с DeepLabV3, выводы</td><td class="n">3</td></tr>
+  </tbody>
+  <tfoot><tr><td>Итого</td><td class="n">20</td></tr></tfoot>
+</table>
+</div>
+
+<h2 id="criteria">Критерии и шкала оценивания</h2>
+<p>Баллы за каждый критерий начисляются так:</p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Уровень выполнения критерия</th><th>Доля баллов</th></tr></thead>
+  <tbody>
+    <tr><td>Выполнено полностью и верно, студент уверенно объясняет решение</td><td>100 %</td></tr>
+    <tr><td>Выполнено с несущественными ошибками или неполными объяснениями</td><td>50–75 %</td></tr>
+    <tr><td>Выполнено частично, есть существенные ошибки</td><td>25 %</td></tr>
+    <tr><td>Не выполнено или студент не может объяснить собственный код</td><td>0 %</td></tr>
+  </tbody>
+</table>
+</div>
+<p>Работа считается зачтённой, если набрано не менее 11 баллов из 20. Работа, сданная позже срока без уважительной причины, оценивается с понижающим коэффициентом 0,8.</p>
+<p>Сумма баллов за пять работ (до 100) переводится в оценку по шкале:</p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Баллы за практику</th><th>Оценка</th></tr></thead>
+  <tbody>
+    <tr><td>85–100</td><td>отлично</td></tr>
+    <tr><td>70–84</td><td>хорошо</td></tr>
+    <tr><td>55–69</td><td>удовлетворительно</td></tr>
+    <tr><td>0–54</td><td>неудовлетворительно</td></tr>
+  </tbody>
+</table>
+</div>
+<p>Баллы за практику входят в итоговую оценку по курсу с весом 60 % (см. <a href="program.html#control">формы контроля</a>).</p>
+</div>
+
+</main>
+<footer class="site-footer">
+  <div class="site-footer__inner">
+    <span>ЭУМК «Основы компьютерного зрения». Автор: <a href="author.html">Гордова Анна</a>, 2026</span>
+    <span><a href="sources.html">Литература</a>&emsp;<a href="guide.html">Как пользоваться курсом</a></span>
+  </div>
+</footer>
+</body>
+</html>

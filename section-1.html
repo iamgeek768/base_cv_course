@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Что такое изображение — Основы компьютерного зрения</title>
+<meta name="description" content="Раздел 1 курса «Основы компьютерного зрения»: что такое изображение.">
+<meta name="author" content="Гордова Анна">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Unbounded:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 3 3'%3E%3Crect width='1' height='1' fill='%23c8323f'/%3E%3Crect x='1' y='1' width='1' height='1' fill='%23157f69'/%3E%3Crect x='2' y='2' width='1' height='1' fill='%232453a6'/%3E%3C/svg%3E">
+<script src="assets/site.js"></script>
+</head>
+<body>
+<a class="skip" href="#main">Перейти к содержимому</a>
+<header class="site-header">
+  <div class="site-header__inner">
+    <a class="brand" href="index.html"><span class="brand__mark" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span>Основы компьютерного зрения</a>
+    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">Меню</button>
+    <nav class="site-nav" id="site-nav" aria-label="Основная навигация">
+      <ul>
+        <li><a href="index.html">Главная</a></li>
+        <li><a href="program.html">Программа</a></li>
+        <li><a href="section-1.html" aria-current="page">Лекции</a></li>
+        <li><a href="test.html">Тест</a></li>
+        <li><a href="practice.html">Практика</a></li>
+        <li><a href="sources.html">Литература</a></li>
+        <li><a href="guide.html">Руководство</a></li>
+        <li><a href="author.html">Об авторе</a></li>
+      </ul>
+    </nav>
+    <button class="theme-toggle" type="button"><span class="tt-icon" aria-hidden="true">◐</span><span class="tt-text">Тёмная тема</span></button>
+  </div>
+</header>
+<div class="layout">
+<aside class="sidebar" aria-label="Разделы курса">
+<h2>Разделы курса</h2>
+<ol>
+<li><a href="section-1.html" aria-current="page"><span class="num">1</span><span>Что такое изображение</span></a></li>
+<li><a href="section-2.html"><span class="num">2</span><span>Классические методы обработки</span></a></li>
+<li><a href="section-3.html"><span class="num">3</span><span>Свёртки</span></a></li>
+<li><a href="section-4.html"><span class="num">4</span><span>Классификация на основе свёрток</span></a></li>
+<li><a href="section-5.html"><span class="num">5</span><span>Детекция объектов</span></a></li>
+<li><a href="section-6.html"><span class="num">6</span><span>Сегментация изображений</span></a></li>
+</ol>
+<div class="toc-block"><h2>На этой странице</h2>
+<ul class="toc">
+<li><a href="#function">Изображение как функция</a></li>
+<li><a href="#coords">Система координат и форма массива</a></li>
+<li><a href="#color">Цветовые модели</a></li>
+<li><a href="#formats">Форматы хранения и сжатие</a></li>
+<li><a href="#camera">Как камера формирует изображение</a></li>
+<li><a href="#histogram">Гистограмма яркости</a></li>
+<li><a href="#questions">Контрольные вопросы</a></li>
+<li><a href="#exercises">Упражнения для самостоятельной работы</a></li>
+</ul></div>
+</aside>
+<main id="main"><article class="prose">
+<div class="page-head">
+  <p class="kicker">Раздел 1 из 6, объём 6 ак. ч</p>
+  <h1>Что такое изображение</h1>
+  <p class="lead">Для человека изображение — это сцена, для компьютера — таблица чисел. Раздел объясняет, как непрерывная картинка превращается в массив пикселей и что означают эти числа.</p>
+</div>
+
+<h2 id="function">Изображение как функция</h2>
+<p>Полутоновое (одноканальное) изображение удобно рассматривать как функцию двух переменных <code>f(x, y)</code>, значение которой в точке с координатами <code>(x, y)</code> — яркость, или интенсивность, в этой точке <span class="ref">[<a href="sources.html#src-1">1</a>, гл. 2]</span>. Для реальной сцены эта функция непрерывна: и координаты, и яркость могут принимать любые значения.</p>
+<p>Чтобы сохранить изображение в памяти компьютера, его нужно сделать дискретным по двум осям:</p>
+<ul>
+  <li><strong>Дискретизация</strong> — выбор значений функции только в узлах прямоугольной сетки. Число узлов по горизонтали и вертикали задаёт <em>разрешение</em>, например 1920 × 1080.</li>
+  <li><strong>Квантование</strong> — округление яркости до одного из конечного числа уровней. При глубине 8 бит на канал уровней 2<sup>8</sup> = 256: от 0 (чёрный) до 255 (белый).</li>
+</ul>
+<p>Результат — матрица из <code>H</code> строк и <code>W</code> столбцов. Каждый её элемент называется <strong>пикселем</strong> (от <i>picture element</i>). Недостаточная дискретизация приводит к потере мелких деталей и ступенчатости контуров (алиасингу), недостаточное квантование — к ложным контурам на плавных переходах яркости <span class="ref">[<a href="sources.html#src-1">1</a>, гл. 2]</span>.</p>
+
+<figure>
+  <div class="fig-box">
+    <div class="matrices">
+      <div>
+        <div class="matrix" style="grid-template-columns:repeat(6,auto)">
+          <span>12</span><span>15</span><span>18</span><span>20</span><span>22</span><span>25</span>
+          <span>14</span><span>90</span><span>96</span><span>98</span><span>94</span><span>27</span>
+          <span>16</span><span>95</span><span class="hl">250</span><span class="hl">255</span><span>97</span><span>28</span>
+          <span>17</span><span>93</span><span class="hl">248</span><span class="hl">251</span><span>99</span><span>30</span>
+          <span>19</span><span>91</span><span>94</span><span>97</span><span>92</span><span>31</span>
+          <span>20</span><span>22</span><span>24</span><span>26</span><span>28</span><span>33</span>
+        </div>
+        <div class="cap">Фрагмент 6×6 полутонового изображения: светлое пятно в центре</div>
+      </div>
+    </div>
+  </div>
+  <figcaption>Рис. 1.1. Так изображение хранится в памяти: каждое число — яркость одного пикселя от 0 до 255.</figcaption>
+</figure>
+
+<h2 id="coords">Система координат и форма массива</h2>
+<p>В библиотеках обработки изображений начало координат находится в <strong>левом верхнем углу</strong>, ось строк направлена вниз, ось столбцов — вправо. В NumPy и OpenCV к пикселю обращаются как <code>img[row, col]</code>, то есть сначала идёт вертикальная координата <code>y</code>, затем горизонтальная <code>x</code> <span class="ref">[<a href="sources.html#src-8">8</a>]</span>.</p>
+<p>Форма массива цветного изображения — <code>(H, W, C)</code>, где <code>C</code> — число каналов (обычно 3). В PyTorch принят порядок <code>(C, H, W)</code>, а пакет изображений хранится как тензор <code>(N, C, H, W)</code> <span class="ref">[<a href="sources.html#src-9">9</a>]</span>.</p>
+<pre><code><span class="c"># Загрузка и устройство изображения</span>
+import cv2
+
+img = cv2.imread("cat.jpg")          <span class="c"># numpy.ndarray, dtype=uint8</span>
+print(img.shape)                     <span class="c"># (480, 640, 3): H, W, C</span>
+print(img[0, 0])                     <span class="c"># [B G R] левого верхнего пикселя</span>
+gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+print(gray.shape, gray.min(), gray.max())</code></pre>
+<div class="note"><p>OpenCV по историческим причинам хранит каналы в порядке <strong>BGR</strong>, а Matplotlib и большинство нейросетевых библиотек ожидают <strong>RGB</strong>. Перед выводом через <code>plt.imshow</code> переставьте каналы: <code>cv2.cvtColor(img, cv2.COLOR_BGR2RGB)</code>.</p></div>
+
+<h2 id="color">Цветовые модели</h2>
+<p>Цвет пикселя задаётся несколькими числами. Набор правил, по которым эти числа превращаются в цвет, называется цветовой моделью <span class="ref">[<a href="sources.html#src-1">1</a>, гл. 6]</span>.</p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Модель</th><th>Компоненты</th><th>Где используется</th></tr></thead>
+  <tbody>
+    <tr><td>RGB</td><td>Красный, зелёный, синий; аддитивное смешение</td><td>Камеры, мониторы, вход нейросетей</td></tr>
+    <tr><td>HSV</td><td>Тон (Hue), насыщенность (Saturation), значение (Value)</td><td>Выделение объектов по цвету: тон мало зависит от освещённости</td></tr>
+    <tr><td>Lab</td><td>Светлота L и две цветоразностные оси a, b</td><td>Измерение цветовых различий, близкое к восприятию человека</td></tr>
+    <tr><td>YCrCb</td><td>Яркость Y и цветоразностные Cr, Cb</td><td>Сжатие JPEG и видео, детекция кожи</td></tr>
+    <tr><td>CMYK</td><td>Голубой, пурпурный, жёлтый, чёрный; субтрактивное смешение</td><td>Полиграфия</td></tr>
+  </tbody>
+</table>
+</div>
+<p>Перевод цветного изображения в полутоновое выполняется взвешенной суммой каналов. Веса учитывают, что глаз человека наиболее чувствителен к зелёному свету (рекомендация ITU-R BT.601):</p>
+<div class="formula">Y = 0,299·R + 0,587·G + 0,114·B</div>
+
+<h2 id="formats">Форматы хранения и сжатие</h2>
+<p>Несжатое изображение 1920 × 1080 с тремя 8-битными каналами занимает 1920 · 1080 · 3 = 6 220 800 байт, около 5,9 МиБ. Поэтому изображения почти всегда хранят сжатыми <span class="ref">[<a href="sources.html#src-1">1</a>, гл. 8]</span>.</p>
+<ul>
+  <li><strong>PNG</strong> — сжатие без потерь, поддерживает прозрачность (альфа-канал). Подходит для масок сегментации, схем, скриншотов.</li>
+  <li><strong>JPEG</strong> — сжатие с потерями на основе дискретного косинусного преобразования блоков 8 × 8. Даёт малый размер фотографий, но вносит артефакты на резких границах. Для масок разметки не подходит.</li>
+  <li><strong>BMP</strong> — как правило без сжатия, простой формат.</li>
+  <li><strong>TIFF</strong> — гибкий контейнер, поддерживает 16 и 32 бита на канал; применяется в медицине, микроскопии, ДЗЗ.</li>
+</ul>
+
+<h2 id="camera">Как камера формирует изображение</h2>
+<p>Простейшая геометрическая модель камеры — <strong>камера-обскура</strong> (pinhole camera). Точка сцены с координатами <code>(X, Y, Z)</code> в системе камеры проецируется на плоскость изображения так <span class="ref">[<a href="sources.html#src-2">2</a>, гл. 2; <a href="sources.html#src-3">3</a>, гл. 1]</span>:</p>
+<div class="formula">x = f · X / Z,   y = f · Y / Z
+<span class="where">где f — фокусное расстояние. Деление на глубину Z объясняет, почему удалённые предметы выглядят меньше и почему по одному снимку нельзя однозначно восстановить расстояние до объекта.</span></div>
+<p>Свет регистрирует матрица сенсора. Каждая её ячейка измеряет только суммарную яркость, поэтому для получения цвета над сенсором ставят мозаику светофильтров — обычно <strong>фильтр Байера</strong>: в каждом квадрате 2 × 2 два зелёных, один красный и один синий элемент. Недостающие значения цвета в каждом пикселе восстанавливаются интерполяцией (демозаикой) <span class="ref">[<a href="sources.html#src-2">2</a>, гл. 2]</span>.</p>
+
+<h2 id="histogram">Гистограмма яркости</h2>
+<p><strong>Гистограмма</strong> полутонового изображения — это функция <code>h(k)</code>, равная числу пикселей с яркостью <code>k</code>, где <code>k = 0…255</code>. Нормированная гистограмма <code>p(k) = h(k) / (H·W)</code> — оценка вероятности встретить яркость <code>k</code> <span class="ref">[<a href="sources.html#src-1">1</a>, гл. 3]</span>.</p>
+<p>По гистограмме видно, тёмное изображение или светлое, низкий у него контраст или высокий. Если значения собраны в узком диапазоне, контраст низкий и его можно улучшить методами раздела 2. Гистограмма — простейший <em>глобальный признак</em> изображения: она не зависит от поворота и перестановки пикселей, но и не несёт информации об их расположении.</p>
+<pre><code>import numpy as np
+hist = np.bincount(gray.ravel(), minlength=256)   <span class="c"># h(k)</span>
+p = hist / gray.size                               <span class="c"># p(k)</span></code></pre>
+
+<h2 id="questions">Контрольные вопросы</h2>
+<ol class="qlist">
+  <li>Чем дискретизация отличается от квантования? Какие артефакты возникают при недостатке каждой из них?</li>
+  <li>Сколько уровней яркости можно закодировать при глубине 8, 10 и 16 бит на канал?</li>
+  <li>Где находится начало координат изображения в OpenCV и в каком порядке указываются индексы пикселя?</li>
+  <li>Почему для выделения объектов по цвету часто переходят из RGB в HSV?</li>
+  <li>Почему при переводе в оттенки серого у зелёного канала наибольший вес?</li>
+  <li>Чем PNG отличается от JPEG и какой формат выбрать для хранения масок сегментации?</li>
+  <li>Что такое фильтр Байера и зачем нужна демозаика?</li>
+  <li>Какую информацию даёт гистограмма изображения и какой информации в ней нет?</li>
+</ol>
+
+<h2 id="exercises">Упражнения для самостоятельной работы</h2>
+<div class="exercise">
+  <h4>Упражнение 1.1. Объём памяти и перевод в оттенки серого</h4>
+  <p>Вычислите объём памяти несжатого RGB-изображения 1280 × 720 с глубиной 8 бит на канал. Переведите пиксель с цветом (R, G, B) = (200, 100, 50) в оттенок серого по формуле BT.601.</p>
+</div>
+<div class="exercise">
+  <h4>Упражнение 1.2. Каналы изображения</h4>
+  <p>Загрузите любую цветную фотографию средствами OpenCV, выведите отдельно каналы R, G и B в виде полутоновых изображений, затем каналы H, S и V. Опишите, в каком канале объект лучше всего отделяется от фона.</p>
+</div>
+<div class="exercise">
+  <h4>Упражнение 1.3. Квантование</h4>
+  <p>Уменьшите число уровней яркости полутонового изображения до 64, 16, 4 и 2 по формуле <code>q = (v // s) * s</code>, где <code>s = 256 / уровни</code>. При каком числе уровней становятся заметны ложные контуры?</p>
+</div>
+<div class="exercise">
+  <h4>Упражнение 1.4. Гистограмма</h4>
+  <p>Постройте гистограммы для тёмной, светлой и малоконтрастной фотографий. Объясните, как форма гистограммы связана с видом изображения.</p>
+</div>
+
+<details class="solution" open>
+  <summary>Пример выполнения упражнения 1.1</summary>
+  <div class="body">
+    <p><strong>Объём памяти.</strong> Число пикселей: 1280 · 720 = 921 600. На каждый пиксель приходится 3 канала по 1 байту, то есть 3 байта:</p>
+    <div class="formula">921 600 · 3 = 2 764 800 байт ≈ 2 700 КиБ ≈ 2,64 МиБ</div>
+    <p><strong>Перевод в оттенок серого.</strong></p>
+    <div class="formula">Y = 0,299·200 + 0,587·100 + 0,114·50 = 59,8 + 58,7 + 5,7 = 124,2 ≈ 124</div>
+    <p>Проверка в Python:</p>
+<pre><code>import numpy as np, cv2
+px = np.uint8([[[50, 100, 200]]])          <span class="c"># порядок BGR!</span>
+print(cv2.cvtColor(px, cv2.COLOR_BGR2GRAY))  <span class="c"># [[124]]</span></code></pre>
+    <p><strong>Ответ:</strong> 2 764 800 байт; яркость 124.</p>
+  </div>
+</details>
+
+<nav class="pager" aria-label="Соседние разделы">
+<a class="prev" href="program.html"><small>Назад</small>Рабочая программа</a>
+<a class="next" href="section-2.html"><small>Следующий раздел</small>2. Классические методы обработки</a>
+</nav>
+</article></main>
+</div>
+<footer class="site-footer">
+  <div class="site-footer__inner">
+    <span>ЭУМК «Основы компьютерного зрения». Автор: <a href="author.html">Гордова Анна</a>, 2026</span>
+    <span><a href="sources.html">Литература</a>&emsp;<a href="guide.html">Как пользоваться курсом</a></span>
+  </div>
+</footer>
+</body>
+</html>

@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Классификация на основе свёрток — Основы компьютерного зрения</title>
+<meta name="description" content="Раздел 4 курса «Основы компьютерного зрения»: классификация на основе свёрток.">
+<meta name="author" content="Гордова Анна">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Unbounded:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 3 3'%3E%3Crect width='1' height='1' fill='%23c8323f'/%3E%3Crect x='1' y='1' width='1' height='1' fill='%23157f69'/%3E%3Crect x='2' y='2' width='1' height='1' fill='%232453a6'/%3E%3C/svg%3E">
+<script src="assets/site.js"></script>
+</head>
+<body>
+<a class="skip" href="#main">Перейти к содержимому</a>
+<header class="site-header">
+  <div class="site-header__inner">
+    <a class="brand" href="index.html"><span class="brand__mark" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span>Основы компьютерного зрения</a>
+    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">Меню</button>
+    <nav class="site-nav" id="site-nav" aria-label="Основная навигация">
+      <ul>
+        <li><a href="index.html">Главная</a></li>
+        <li><a href="program.html">Программа</a></li>
+        <li><a href="section-1.html" aria-current="page">Лекции</a></li>
+        <li><a href="test.html">Тест</a></li>
+        <li><a href="practice.html">Практика</a></li>
+        <li><a href="sources.html">Литература</a></li>
+        <li><a href="guide.html">Руководство</a></li>
+        <li><a href="author.html">Об авторе</a></li>
+      </ul>
+    </nav>
+    <button class="theme-toggle" type="button"><span class="tt-icon" aria-hidden="true">◐</span><span class="tt-text">Тёмная тема</span></button>
+  </div>
+</header>
+<div class="layout">
+<aside class="sidebar" aria-label="Разделы курса">
+<h2>Разделы курса</h2>
+<ol>
+<li><a href="section-1.html"><span class="num">1</span><span>Что такое изображение</span></a></li>
+<li><a href="section-2.html"><span class="num">2</span><span>Классические методы обработки</span></a></li>
+<li><a href="section-3.html"><span class="num">3</span><span>Свёртки</span></a></li>
+<li><a href="section-4.html" aria-current="page"><span class="num">4</span><span>Классификация на основе свёрток</span></a></li>
+<li><a href="section-5.html"><span class="num">5</span><span>Детекция объектов</span></a></li>
+<li><a href="section-6.html"><span class="num">6</span><span>Сегментация изображений</span></a></li>
+</ol>
+<div class="toc-block"><h2>На этой странице</h2>
+<ul class="toc">
+<li><a href="#task">Постановка задачи</a></li>
+<li><a href="#layers">Из чего состоит свёрточная сеть</a></li>
+<li><a href="#training">Обучение</a></li>
+<li><a href="#architectures">Ключевые архитектуры</a></li>
+<li><a href="#transfer">Перенос обучения</a></li>
+<li><a href="#metrics">Метрики качества</a></li>
+<li><a href="#code">Пример: сеть для CIFAR-10</a></li>
+<li><a href="#questions">Контрольные вопросы</a></li>
+<li><a href="#exercises">Упражнения для самостоятельной работы</a></li>
+</ul></div>
+</aside>
+<main id="main"><article class="prose">
+<div class="page-head">
+  <p class="kicker">Раздел 4 из 6, объём 18 ак. ч</p>
+  <h1>Классификация на основе свёрток</h1>
+  <p class="lead">Свёрточная нейронная сеть не получает ядра от человека, а подбирает их сама по размеченным примерам. Раздел объясняет, из чего она состоит, как обучается и какие архитектуры стали классикой.</p>
+</div>
+
+<h2 id="task">Постановка задачи</h2>
+<p>В задаче классификации модель получает изображение и возвращает один из <code>C</code> заранее известных классов: «кошка», «собака», «автомобиль» и так далее. Последний слой сети выдаёт <code>C</code> чисел — логитов <code>z<sub>k</sub></code>. Функция <strong>softmax</strong> превращает их в вероятности, а обучение минимизирует <strong>кросс-энтропию</strong> между предсказанием и правильным классом <code>y</code> <span class="ref">[<a href="sources.html#src-5">5</a>, гл. 6; <a href="sources.html#src-7">7</a>]</span>:</p>
+<div class="formula">p<sub>k</sub> = e<sup>z<sub>k</sub></sup> / Σ<sub>j</sub> e<sup>z<sub>j</sub></sup>,        L = −log p<sub>y</sub></div>
+<p><strong>Почему не обычная полносвязная сеть?</strong> Изображение 224 × 224 × 3 — это 150 528 входных чисел. Один полносвязный слой из 1000 нейронов потребовал бы около 150 миллионов весов, при этом сеть не знала бы, что соседние пиксели связаны между собой. Свёрточный слой решает обе проблемы <span class="ref">[<a href="sources.html#src-5">5</a>, гл. 9; <a href="sources.html#src-6">6</a>]</span>:</p>
+<ul>
+  <li><strong>локальная связность</strong> — каждый выход зависит только от небольшой окрестности входа;</li>
+  <li><strong>разделение весов</strong> — одно и то же ядро применяется во всех позициях, поэтому параметров на порядки меньше;</li>
+  <li><strong>эквивариантность к сдвигу</strong> — признак распознаётся в любом месте изображения.</li>
+</ul>
+
+<h2 id="layers">Из чего состоит свёрточная сеть</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Слой</th><th>Что делает</th><th>PyTorch</th></tr></thead>
+  <tbody>
+    <tr><td>Свёрточный</td><td>Применяет набор обучаемых ядер, выдаёт карты признаков</td><td><code>nn.Conv2d</code></td></tr>
+    <tr><td>Функция активации ReLU</td><td><code>f(x) = max(0, x)</code>; вносит нелинейность, не насыщается при больших x</td><td><code>nn.ReLU</code></td></tr>
+    <tr><td>Пулинг (max, average)</td><td>Уменьшает пространственный размер, обычно вдвое, и придаёт устойчивость к малым сдвигам</td><td><code>nn.MaxPool2d</code></td></tr>
+    <tr><td>Нормализация по батчу</td><td>Приводит активации к нулевому среднему и единичной дисперсии; ускоряет и стабилизирует обучение <span class="ref">[<a href="sources.html#src-30">30</a>]</span></td><td><code>nn.BatchNorm2d</code></td></tr>
+    <tr><td>Dropout</td><td>Случайно обнуляет часть нейронов при обучении; борется с переобучением</td><td><code>nn.Dropout</code></td></tr>
+    <tr><td>Глобальный пулинг</td><td>Усредняет каждую карту признаков в одно число</td><td><code>nn.AdaptiveAvgPool2d(1)</code></td></tr>
+    <tr><td>Полносвязный</td><td>Отображает вектор признаков в логиты классов</td><td><code>nn.Linear</code></td></tr>
+  </tbody>
+</table>
+</div>
+<p>Типичная сеть чередует блоки «свёртка → нормализация → ReLU → пулинг»: пространственный размер уменьшается, а число каналов растёт. Первые слои учатся находить границы и цветовые пятна, средние — текстуры и части объектов, последние — признаки целых объектов <span class="ref">[<a href="sources.html#src-7">7</a>; <a href="sources.html#src-2">2</a>, гл. 5]</span>.</p>
+<h3>Рецептивное поле</h3>
+<p><strong>Рецептивное поле</strong> нейрона — область входного изображения, от которой зависит его значение. Два последовательных слоя 3 × 3 дают поле 5 × 5, три — 7 × 7. Три слоя 3 × 3 с <code>C</code> каналами содержат <code>27C²</code> весов против <code>49C²</code> у одного слоя 7 × 7 и вдобавок дают три нелинейности вместо одной. На этом наблюдении построена архитектура VGG <span class="ref">[<a href="sources.html#src-22">22</a>]</span>.</p>
+
+<h2 id="training">Обучение</h2>
+<p>Данные делят на три части: <strong>обучающую</strong> выборку (по ней подбираются веса), <strong>валидационную</strong> (по ней выбираются гиперпараметры и момент остановки) и <strong>тестовую</strong> (на ней один раз измеряется итоговое качество).</p>
+<p>Веса обновляются методом стохастического градиентного спуска по мини-батчам. Градиент функции потерь по всем весам вычисляет алгоритм <strong>обратного распространения ошибки</strong> <span class="ref">[<a href="sources.html#src-5">5</a>, гл. 6, 8]</span>:</p>
+<div class="formula">w ← w − η · ∂L/∂w
+<span class="where">η — скорость обучения (learning rate), важнейший гиперпараметр. На практике используют SGD с моментом или Adam и постепенно уменьшают η по расписанию.</span></div>
+<h3>Переобучение и регуляризация</h3>
+<p>Сеть с миллионами параметров легко запоминает обучающие примеры. Признак переобучения — точность на обучающей выборке растёт, а на валидационной перестаёт расти или падает. Средства борьбы:</p>
+<ul>
+  <li><strong>аугментация данных</strong> — случайные отражения, обрезки, повороты, изменение яркости и цвета; модель видит каждый пример в разных вариантах;</li>
+  <li><strong>затухание весов</strong> (weight decay, L2-регуляризация);</li>
+  <li><strong>dropout</strong> и <strong>ранняя остановка</strong> по валидационной метрике;</li>
+  <li><strong>перенос обучения</strong> с большой выборки на маленькую.</li>
+</ul>
+
+<h2 id="architectures">Ключевые архитектуры</h2>
+<p>Развитие архитектур во многом связано с соревнованием ImageNet ILSVRC: 1,28 млн обучающих изображений, 1000 классов. Метрика top-5 error — доля изображений, у которых правильного класса нет среди пяти наиболее вероятных ответов.</p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Архитектура</th><th class="n">Год</th><th class="n">Слоёв</th><th class="n">Параметров</th><th>Главная идея</th><th class="n">Top-5 error</th></tr></thead>
+  <tbody>
+    <tr><td>LeNet-5 <span class="ref">[<a href="sources.html#src-12">12</a>]</span></td><td class="n">1998</td><td class="n">7</td><td class="n">≈ 60 тыс.</td><td>Первая практическая CNN, распознавание рукописных цифр</td><td class="n">—</td></tr>
+    <tr><td>AlexNet <span class="ref">[<a href="sources.html#src-13">13</a>]</span></td><td class="n">2012</td><td class="n">8</td><td class="n">≈ 60 млн</td><td>ReLU, dropout, обучение на GPU</td><td class="n">15,3 %</td></tr>
+    <tr><td>VGG-16 <span class="ref">[<a href="sources.html#src-22">22</a>]</span></td><td class="n">2014</td><td class="n">16</td><td class="n">≈ 138 млн</td><td>Только ядра 3 × 3, большая глубина</td><td class="n">7,3 %</td></tr>
+    <tr><td>GoogLeNet <span class="ref">[<a href="sources.html#src-35">35</a>]</span></td><td class="n">2014</td><td class="n">22</td><td class="n">≈ 7 млн</td><td>Inception-блоки: параллельные ядра 1×1, 3×3, 5×5</td><td class="n">6,7 %</td></tr>
+    <tr><td>ResNet-152 <span class="ref">[<a href="sources.html#src-14">14</a>]</span></td><td class="n">2015</td><td class="n">152</td><td class="n">≈ 60 млн</td><td>Остаточные связи <code>y = F(x) + x</code></td><td class="n">3,6 %</td></tr>
+    <tr><td>ViT <span class="ref">[<a href="sources.html#src-26">26</a>]</span></td><td class="n">2020</td><td class="n">12–32</td><td class="n">86–632 млн</td><td>Трансформер над фрагментами 16 × 16</td><td class="n">—</td></tr>
+  </tbody>
+</table>
+</div>
+<p><strong>Остаточные связи ResNet.</strong> До 2015 года добавление слоёв сверх 20–30 ухудшало качество даже на обучающей выборке: глубокую сеть было трудно оптимизировать. ResNet добавляет вход блока к его выходу. Если блоку нечего добавить, ему достаточно обучить <code>F(x) ≈ 0</code>, а градиент свободно проходит через сумму к ранним слоям. Это позволило обучать сети глубиной в сотни слоёв <span class="ref">[<a href="sources.html#src-14">14</a>]</span>.</p>
+
+<h2 id="transfer">Перенос обучения</h2>
+<p>Признаки, выученные сетью на ImageNet, полезны и для других задач: границы, текстуры и формы универсальны. Поэтому вместо обучения с нуля берут предобученную сеть и заменяют её последний слой на новый с нужным числом классов <span class="ref">[<a href="sources.html#src-7">7</a>; <a href="sources.html#src-9">9</a>]</span>.</p>
+<ul>
+  <li><strong>Извлечение признаков:</strong> все слои, кроме нового последнего, заморожены. Подходит, когда данных совсем мало.</li>
+  <li><strong>Дообучение</strong> (fine-tuning): обучается вся сеть с маленькой скоростью обучения. Даёт лучшее качество при сотнях и тысячах примеров.</li>
+</ul>
+<pre><code>import torch.nn as nn
+from torchvision import models
+
+model = models.resnet18(weights=models.ResNet18_Weights.DEFAULT)
+for p in model.parameters():
+    p.requires_grad = False                     <span class="c"># заморозить признаки</span>
+model.fc = nn.Linear(model.fc.in_features, 5)   <span class="c"># новая «голова» на 5 классов</span></code></pre>
+
+<h2 id="metrics">Метрики качества</h2>
+<p>Для каждого класса по <strong>матрице ошибок</strong> считают истинно положительные (TP), ложноположительные (FP) и ложноотрицательные (FN) ответы <span class="ref">[<a href="sources.html#src-20">20</a>]</span>:</p>
+<div class="formula">Precision = TP / (TP + FP)    Recall = TP / (TP + FN)    F1 = 2 · P · R / (P + R)</div>
+<p><strong>Accuracy</strong> — доля верных ответов среди всех. На несбалансированных данных она обманчива: если 95 % снимков здоровые, модель, всегда отвечающая «здоров», получит accuracy 95 % при нулевой полноте по больным. В таких случаях смотрят на precision, recall и F1 по каждому классу.</p>
+
+<h2 id="code">Пример: сеть для CIFAR-10</h2>
+<pre><code>import torch, torch.nn as nn
+
+class SmallCNN(nn.Module):
+    def __init__(self, n_classes=10):
+        super().__init__()
+        self.features = nn.Sequential(
+            nn.Conv2d(3, 32, 3, padding=1), nn.BatchNorm2d(32), nn.ReLU(), nn.MaxPool2d(2),
+            nn.Conv2d(32, 64, 3, padding=1), nn.BatchNorm2d(64), nn.ReLU(), nn.MaxPool2d(2),
+            nn.Conv2d(64, 128, 3, padding=1), nn.BatchNorm2d(128), nn.ReLU(),
+            nn.AdaptiveAvgPool2d(1),
+        )
+        self.head = nn.Linear(128, n_classes)
+
+    def forward(self, x):
+        return self.head(self.features(x).flatten(1))
+
+model = SmallCNN()
+opt = torch.optim.Adam(model.parameters(), lr=1e-3)
+loss_fn = nn.CrossEntropyLoss()
+
+for images, labels in train_loader:      <span class="c"># одна эпоха обучения</span>
+    opt.zero_grad()
+    loss = loss_fn(model(images), labels)
+    loss.backward()
+    opt.step()</code></pre>
+
+<h2 id="questions">Контрольные вопросы</h2>
+<ol class="qlist">
+  <li>Назовите три свойства свёрточного слоя, которые делают его эффективнее полносвязного для изображений.</li>
+  <li>Зачем нужны функция softmax и кросс-энтропия?</li>
+  <li>Что такое рецептивное поле? Каково оно у трёх последовательных слоёв 3 × 3?</li>
+  <li>Как по кривым обучения распознать переобучение? Перечислите способы с ним бороться.</li>
+  <li>Какую проблему решают остаточные связи ResNet?</li>
+  <li>Чем извлечение признаков отличается от дообучения при переносе обучения?</li>
+  <li>Почему accuracy может вводить в заблуждение? Какие метрики использовать вместо неё?</li>
+</ol>
+
+<h2 id="exercises">Упражнения для самостоятельной работы</h2>
+<div class="exercise">
+  <h4>Упражнение 4.1. Размеры тензоров и число параметров</h4>
+  <p>Сеть: вход 3 × 32 × 32 → Conv(3 → 16, 3 × 3, padding 1) → ReLU → MaxPool(2) → Conv(16 → 32, 3 × 3, padding 1) → ReLU → MaxPool(2) → Flatten → Linear(→ 10). Найдите размер выхода каждого слоя и общее число параметров.</p>
+</div>
+<div class="exercise">
+  <h4>Упражнение 4.2. Обучение на Fashion-MNIST</h4>
+  <p>Обучите сеть из примера на наборе Fashion-MNIST (заменив число входных каналов на 1). Постройте графики потерь и точности на обучающей и валидационной выборках, найдите эпоху, после которой начинается переобучение.</p>
+</div>
+<div class="exercise">
+  <h4>Упражнение 4.3. Перенос обучения</h4>
+  <p>Соберите по 100 изображений двух-трёх классов (например, разные породы цветов). Сравните точность ResNet-18, обученной с нуля, с извлечением признаков и с дообучением.</p>
+</div>
+<div class="exercise">
+  <h4>Упражнение 4.4. Метрики по матрице ошибок</h4>
+  <p>Классификатор «кошка / не кошка» на 100 изображениях дал TP = 30, FP = 10, FN = 5, TN = 55. Вычислите accuracy, precision, recall и F1.</p>
+</div>
+
+<details class="solution" open>
+  <summary>Пример выполнения упражнения 4.1</summary>
+  <div class="body">
+    <p>Свёртка 3 × 3 с отступом 1 и шагом 1 сохраняет пространственный размер, MaxPool(2) уменьшает его вдвое. Параметры свёртки считаются по формуле <code>C<sub>out</sub> · (C<sub>in</sub> · 9 + 1)</code>, полносвязного слоя — <code>вход · выход + выход</code>.</p>
+    <div class="table-wrap">
+    <table>
+      <thead><tr><th>Слой</th><th>Размер выхода</th><th class="n">Параметров</th></tr></thead>
+      <tbody>
+        <tr><td>Вход</td><td>3 × 32 × 32</td><td class="n">0</td></tr>
+        <tr><td>Conv 3 → 16</td><td>16 × 32 × 32</td><td class="n">16 · (27 + 1) = 448</td></tr>
+        <tr><td>ReLU, MaxPool(2)</td><td>16 × 16 × 16</td><td class="n">0</td></tr>
+        <tr><td>Conv 16 → 32</td><td>32 × 16 × 16</td><td class="n">32 · (144 + 1) = 4640</td></tr>
+        <tr><td>ReLU, MaxPool(2)</td><td>32 × 8 × 8</td><td class="n">0</td></tr>
+        <tr><td>Flatten</td><td>2048</td><td class="n">0</td></tr>
+        <tr><td>Linear 2048 → 10</td><td>10</td><td class="n">2048 · 10 + 10 = 20 490</td></tr>
+      </tbody>
+      <tfoot><tr><td>Всего</td><td></td><td class="n">25 578</td></tr></tfoot>
+    </table>
+    </div>
+    <p>Видно, что 80 % параметров приходится на единственный полносвязный слой. Поэтому в современных сетях перед классификатором ставят глобальный пулинг: он сократил бы вход линейного слоя до 32 чисел, а число его параметров — до 330.</p>
+<pre><code>import torch.nn as nn
+net = nn.Sequential(
+    nn.Conv2d(3, 16, 3, padding=1), nn.ReLU(), nn.MaxPool2d(2),
+    nn.Conv2d(16, 32, 3, padding=1), nn.ReLU(), nn.MaxPool2d(2),
+    nn.Flatten(), nn.Linear(32 * 8 * 8, 10))
+print(sum(p.numel() for p in net.parameters()))   <span class="c"># 25578</span></code></pre>
+  </div>
+</details>
+
+<nav class="pager" aria-label="Соседние разделы">
+<a class="prev" href="section-3.html"><small>Предыдущий раздел</small>3. Свёртки</a>
+<a class="next" href="section-5.html"><small>Следующий раздел</small>5. Детекция объектов</a>
+</nav>
+</article></main>
+</div>
+<footer class="site-footer">
+  <div class="site-footer__inner">
+    <span>ЭУМК «Основы компьютерного зрения». Автор: <a href="author.html">Гордова Анна</a>, 2026</span>
+    <span><a href="sources.html">Литература</a>&emsp;<a href="guide.html">Как пользоваться курсом</a></span>
+  </div>
+</footer>
+</body>
+</html>
